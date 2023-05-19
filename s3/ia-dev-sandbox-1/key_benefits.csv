@@ -1,0 +1,19 @@
+benefit_name,age_mte_18,gender_female,hhtype_rural,unskilledlabor_yes,occupation_farming,occupation_cw,jandhanaccnt_yes,holdsinstitutionalland_no,holdsconstitutionalposts_no,paidincometax_no,bpl_yes,age_lte_59,age_mt_10,familyincome_lt_24000,age_mte_60,90dayscw_yes,registeredcw_yes,hospitalised5days_yes,memberlabourboard3years_yes,memberlabourboard1year_yes,marriedtocw_yes,married_yes,children_yes,permanentdisability_yes,widowtoregcw_yes,ownhouse_no,upcomingmarriage_yes,expectingchild_yes
+MGNREGA,1,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+PM Kisan,0,0,0,0,1,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+PM Ujjwala,1,1,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Jan Dhan,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+BPL ration card,0,0,0,0,0,0,0,0,0,0,1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Construction worker registration,1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0
+BoCW Death benefit,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0
+BoCW Medical Assistance,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0
+BoCW Financial assistance for marriage for self,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0,0,1,0,0,0,0,1,0
+BoCW Financial assistance for marriage of children,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,1,0,0,0,1,0
+BoCW Pension benefit,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0,0,1,0,0,0,0,0,0,0,0
+BoCW Family pension,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,1,0,0,0
+BoCW Disability pension,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1,0,0,0,0
+BoCW Ex-gratia payment,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1,0,0,0,0
+BoCW Maternity benefits,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,1,1,0,0,0,0,1
+BoCW Funeral assistance,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,1,0,0,0
+BoCW Financial assistance for education,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,1,1,0,0,0,0,0
+BoCW Purchase of construction of house,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,1,0,0,0,0,0,1,0,0

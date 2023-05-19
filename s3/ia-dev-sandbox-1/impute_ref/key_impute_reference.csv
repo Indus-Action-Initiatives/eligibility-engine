@@ -1,0 +1,8 @@
+source_col,target_col,impute_value
+age_mte_18,age_mt_10,1
+age_mte_60,age_mte_18,1
+age_mte_60,age_mt_10,1
+age_mte_60,age_lte_59,0
+age_lte_59,age_mte_60,0
+marriedtocw_yes,married_yes,1
+children_yes,married_yes,1

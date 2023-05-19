@@ -1,0 +1,101 @@
+beneficiary_name,benefit_name,Proximity_score,Criteria Failed,Criteria Passed,Missing Info,# Criteria Passed,Probability_score
+1,BoCW Financial assistance for marriage for self,-1.0,memberlabourboard3years_yes,"registeredcw_yes, married_yes",upcomingmarriage_yes,2 of 4,0.0
+2,BoCW Financial assistance for marriage for self,0.25,,married_yes,"registeredcw_yes, memberlabourboard3years_yes, upcomingmarriage_yes",1 of 4,0.0
+3,BoCW Financial assistance for marriage for self,-1.0,memberlabourboard3years_yes,"registeredcw_yes, married_yes",upcomingmarriage_yes,2 of 4,0.0
+4,BoCW Financial assistance for marriage for self,-1.0,memberlabourboard3years_yes,"registeredcw_yes, married_yes",upcomingmarriage_yes,2 of 4,0.0
+5,BoCW Financial assistance for marriage for self,-1.0,memberlabourboard3years_yes,married_yes,"registeredcw_yes, upcomingmarriage_yes",1 of 4,0.0
+6,BoCW Financial assistance for marriage for self,-1.0,"memberlabourboard3years_yes, married_yes",,"registeredcw_yes, upcomingmarriage_yes",0 of 4,0.0
+7,BoCW Financial assistance for marriage for self,-1.0,memberlabourboard3years_yes,"registeredcw_yes, married_yes",upcomingmarriage_yes,2 of 4,0.0
+8,BoCW Financial assistance for marriage for self,-1.0,memberlabourboard3years_yes,"registeredcw_yes, married_yes",upcomingmarriage_yes,2 of 4,0.0
+9,BoCW Financial assistance for marriage for self,-1.0,memberlabourboard3years_yes,"registeredcw_yes, married_yes",upcomingmarriage_yes,2 of 4,0.0
+10,BoCW Financial assistance for marriage for self,-1.0,memberlabourboard3years_yes,"registeredcw_yes, married_yes",upcomingmarriage_yes,2 of 4,0.0
+11,BoCW Financial assistance for marriage for self,0.5,,"registeredcw_yes, married_yes","memberlabourboard3years_yes, upcomingmarriage_yes",2 of 4,0.0
+12,BoCW Financial assistance for marriage for self,0.5,,"registeredcw_yes, married_yes","memberlabourboard3years_yes, upcomingmarriage_yes",2 of 4,0.0
+13,BoCW Financial assistance for marriage for self,0.25,,married_yes,"registeredcw_yes, memberlabourboard3years_yes, upcomingmarriage_yes",1 of 4,0.0
+14,BoCW Financial assistance for marriage for self,-1.0,memberlabourboard3years_yes,registeredcw_yes,"married_yes, upcomingmarriage_yes",1 of 4,0.0
+15,BoCW Financial assistance for marriage for self,-1.0,memberlabourboard3years_yes,"registeredcw_yes, married_yes",upcomingmarriage_yes,2 of 4,0.0
+16,BoCW Financial assistance for marriage for self,-1.0,memberlabourboard3years_yes,"registeredcw_yes, married_yes",upcomingmarriage_yes,2 of 4,0.0
+17,BoCW Financial assistance for marriage for self,0.25,,registeredcw_yes,"memberlabourboard3years_yes, married_yes, upcomingmarriage_yes",1 of 4,0.0
+18,BoCW Financial assistance for marriage for self,-1.0,memberlabourboard3years_yes,registeredcw_yes,"married_yes, upcomingmarriage_yes",1 of 4,0.0
+19,BoCW Financial assistance for marriage for self,0.5,,"registeredcw_yes, married_yes","memberlabourboard3years_yes, upcomingmarriage_yes",2 of 4,0.0
+20,BoCW Financial assistance for marriage for self,-1.0,memberlabourboard3years_yes,"registeredcw_yes, married_yes",upcomingmarriage_yes,2 of 4,0.0
+21,BoCW Financial assistance for marriage for self,-1.0,memberlabourboard3years_yes,registeredcw_yes,"married_yes, upcomingmarriage_yes",1 of 4,0.0
+22,BoCW Financial assistance for marriage for self,-1.0,memberlabourboard3years_yes,registeredcw_yes,"married_yes, upcomingmarriage_yes",1 of 4,0.0
+23,BoCW Financial assistance for marriage for self,0.25,,married_yes,"registeredcw_yes, memberlabourboard3years_yes, upcomingmarriage_yes",1 of 4,0.0
+24,BoCW Financial assistance for marriage for self,-1.0,memberlabourboard3years_yes,"registeredcw_yes, married_yes",upcomingmarriage_yes,2 of 4,0.0
+25,BoCW Financial assistance for marriage for self,0.5,,"registeredcw_yes, married_yes","memberlabourboard3years_yes, upcomingmarriage_yes",2 of 4,0.0
+26,BoCW Financial assistance for marriage for self,0.0,,,"registeredcw_yes, memberlabourboard3years_yes, married_yes, upcomingmarriage_yes",0 of 4,0.0
+27,BoCW Financial assistance for marriage for self,-1.0,memberlabourboard3years_yes,registeredcw_yes,"married_yes, upcomingmarriage_yes",1 of 4,0.0
+28,BoCW Financial assistance for marriage for self,-1.0,memberlabourboard3years_yes,married_yes,"registeredcw_yes, upcomingmarriage_yes",1 of 4,0.0
+29,BoCW Financial assistance for marriage for self,0.5,,"registeredcw_yes, married_yes","memberlabourboard3years_yes, upcomingmarriage_yes",2 of 4,0.0
+30,BoCW Financial assistance for marriage for self,-1.0,memberlabourboard3years_yes,"registeredcw_yes, married_yes",upcomingmarriage_yes,2 of 4,0.0
+31,BoCW Financial assistance for marriage for self,-1.0,memberlabourboard3years_yes,married_yes,"registeredcw_yes, upcomingmarriage_yes",1 of 4,0.0
+32,BoCW Financial assistance for marriage for self,-1.0,memberlabourboard3years_yes,registeredcw_yes,"married_yes, upcomingmarriage_yes",1 of 4,0.0
+33,BoCW Financial assistance for marriage for self,-1.0,memberlabourboard3years_yes,"registeredcw_yes, married_yes",upcomingmarriage_yes,2 of 4,0.0
+34,BoCW Financial assistance for marriage for self,0.25,,registeredcw_yes,"memberlabourboard3years_yes, married_yes, upcomingmarriage_yes",1 of 4,0.0
+35,BoCW Financial assistance for marriage for self,0.5,,"registeredcw_yes, married_yes","memberlabourboard3years_yes, upcomingmarriage_yes",2 of 4,0.0
+36,BoCW Financial assistance for marriage for self,0.25,,registeredcw_yes,"memberlabourboard3years_yes, married_yes, upcomingmarriage_yes",1 of 4,0.0
+37,BoCW Financial assistance for marriage for self,-1.0,memberlabourboard3years_yes,"registeredcw_yes, married_yes",upcomingmarriage_yes,2 of 4,0.0
+38,BoCW Financial assistance for marriage for self,-1.0,memberlabourboard3years_yes,"registeredcw_yes, married_yes",upcomingmarriage_yes,2 of 4,0.0
+39,BoCW Financial assistance for marriage for self,-1.0,memberlabourboard3years_yes,"registeredcw_yes, married_yes",upcomingmarriage_yes,2 of 4,0.0
+40,BoCW Financial assistance for marriage for self,-1.0,memberlabourboard3years_yes,married_yes,"registeredcw_yes, upcomingmarriage_yes",1 of 4,0.0
+41,BoCW Financial assistance for marriage for self,0.25,,registeredcw_yes,"memberlabourboard3years_yes, married_yes, upcomingmarriage_yes",1 of 4,0.0
+42,BoCW Financial assistance for marriage for self,0.25,,registeredcw_yes,"memberlabourboard3years_yes, married_yes, upcomingmarriage_yes",1 of 4,0.0
+43,BoCW Financial assistance for marriage for self,0.5,,"registeredcw_yes, married_yes","memberlabourboard3years_yes, upcomingmarriage_yes",2 of 4,0.0
+44,BoCW Financial assistance for marriage for self,-1.0,memberlabourboard3years_yes,"registeredcw_yes, married_yes",upcomingmarriage_yes,2 of 4,0.0
+45,BoCW Financial assistance for marriage for self,-1.0,memberlabourboard3years_yes,registeredcw_yes,"married_yes, upcomingmarriage_yes",1 of 4,0.0
+46,BoCW Financial assistance for marriage for self,0.25,,registeredcw_yes,"memberlabourboard3years_yes, married_yes, upcomingmarriage_yes",1 of 4,0.0
+47,BoCW Financial assistance for marriage for self,-1.0,memberlabourboard3years_yes,registeredcw_yes,"married_yes, upcomingmarriage_yes",1 of 4,0.0
+48,BoCW Financial assistance for marriage for self,-1.0,memberlabourboard3years_yes,"registeredcw_yes, married_yes",upcomingmarriage_yes,2 of 4,0.0
+49,BoCW Financial assistance for marriage for self,-1.0,memberlabourboard3years_yes,"registeredcw_yes, married_yes",upcomingmarriage_yes,2 of 4,0.0
+50,BoCW Financial assistance for marriage for self,0.25,,registeredcw_yes,"memberlabourboard3years_yes, married_yes, upcomingmarriage_yes",1 of 4,0.0
+51,BoCW Financial assistance for marriage for self,-1.0,memberlabourboard3years_yes,"registeredcw_yes, married_yes",upcomingmarriage_yes,2 of 4,0.0
+52,BoCW Financial assistance for marriage for self,-1.0,memberlabourboard3years_yes,"registeredcw_yes, married_yes",upcomingmarriage_yes,2 of 4,0.0
+53,BoCW Financial assistance for marriage for self,-1.0,memberlabourboard3years_yes,"registeredcw_yes, married_yes",upcomingmarriage_yes,2 of 4,0.0
+54,BoCW Financial assistance for marriage for self,-1.0,"memberlabourboard3years_yes, married_yes",registeredcw_yes,upcomingmarriage_yes,1 of 4,0.0
+55,BoCW Financial assistance for marriage for self,0.5,,"registeredcw_yes, married_yes","memberlabourboard3years_yes, upcomingmarriage_yes",2 of 4,0.0
+56,BoCW Financial assistance for marriage for self,-1.0,memberlabourboard3years_yes,married_yes,"registeredcw_yes, upcomingmarriage_yes",1 of 4,0.0
+57,BoCW Financial assistance for marriage for self,0.5,,"registeredcw_yes, married_yes","memberlabourboard3years_yes, upcomingmarriage_yes",2 of 4,0.0
+58,BoCW Financial assistance for marriage for self,-1.0,memberlabourboard3years_yes,"registeredcw_yes, married_yes",upcomingmarriage_yes,2 of 4,0.0
+59,BoCW Financial assistance for marriage for self,-1.0,memberlabourboard3years_yes,,"registeredcw_yes, married_yes, upcomingmarriage_yes",0 of 4,0.0
+60,BoCW Financial assistance for marriage for self,-1.0,memberlabourboard3years_yes,"registeredcw_yes, married_yes",upcomingmarriage_yes,2 of 4,0.0
+61,BoCW Financial assistance for marriage for self,-1.0,memberlabourboard3years_yes,"registeredcw_yes, married_yes",upcomingmarriage_yes,2 of 4,0.0
+62,BoCW Financial assistance for marriage for self,-1.0,memberlabourboard3years_yes,married_yes,"registeredcw_yes, upcomingmarriage_yes",1 of 4,0.0
+63,BoCW Financial assistance for marriage for self,-1.0,memberlabourboard3years_yes,"registeredcw_yes, married_yes",upcomingmarriage_yes,2 of 4,0.0
+64,BoCW Financial assistance for marriage for self,-1.0,memberlabourboard3years_yes,registeredcw_yes,"married_yes, upcomingmarriage_yes",1 of 4,0.0
+65,BoCW Financial assistance for marriage for self,-1.0,"memberlabourboard3years_yes, married_yes",registeredcw_yes,upcomingmarriage_yes,1 of 4,0.0
+66,BoCW Financial assistance for marriage for self,-1.0,memberlabourboard3years_yes,"registeredcw_yes, married_yes",upcomingmarriage_yes,2 of 4,0.0
+67,BoCW Financial assistance for marriage for self,-1.0,memberlabourboard3years_yes,married_yes,"registeredcw_yes, upcomingmarriage_yes",1 of 4,0.0
+68,BoCW Financial assistance for marriage for self,-1.0,memberlabourboard3years_yes,"registeredcw_yes, married_yes",upcomingmarriage_yes,2 of 4,0.0
+69,BoCW Financial assistance for marriage for self,-1.0,memberlabourboard3years_yes,,"registeredcw_yes, married_yes, upcomingmarriage_yes",0 of 4,0.0
+70,BoCW Financial assistance for marriage for self,0.5,,"registeredcw_yes, married_yes","memberlabourboard3years_yes, upcomingmarriage_yes",2 of 4,0.0
+71,BoCW Financial assistance for marriage for self,-1.0,memberlabourboard3years_yes,married_yes,"registeredcw_yes, upcomingmarriage_yes",1 of 4,0.0
+72,BoCW Financial assistance for marriage for self,0.5,,"registeredcw_yes, married_yes","memberlabourboard3years_yes, upcomingmarriage_yes",2 of 4,0.0
+73,BoCW Financial assistance for marriage for self,-1.0,memberlabourboard3years_yes,"registeredcw_yes, married_yes",upcomingmarriage_yes,2 of 4,0.0
+74,BoCW Financial assistance for marriage for self,-1.0,memberlabourboard3years_yes,"registeredcw_yes, married_yes",upcomingmarriage_yes,2 of 4,0.0
+75,BoCW Financial assistance for marriage for self,-1.0,memberlabourboard3years_yes,married_yes,"registeredcw_yes, upcomingmarriage_yes",1 of 4,0.0
+76,BoCW Financial assistance for marriage for self,-1.0,memberlabourboard3years_yes,married_yes,"registeredcw_yes, upcomingmarriage_yes",1 of 4,0.0
+77,BoCW Financial assistance for marriage for self,0.5,,"registeredcw_yes, married_yes","memberlabourboard3years_yes, upcomingmarriage_yes",2 of 4,0.0
+78,BoCW Financial assistance for marriage for self,-1.0,memberlabourboard3years_yes,"registeredcw_yes, married_yes",upcomingmarriage_yes,2 of 4,0.0
+79,BoCW Financial assistance for marriage for self,-1.0,memberlabourboard3years_yes,married_yes,"registeredcw_yes, upcomingmarriage_yes",1 of 4,0.0
+80,BoCW Financial assistance for marriage for self,-1.0,memberlabourboard3years_yes,"registeredcw_yes, married_yes",upcomingmarriage_yes,2 of 4,0.0
+81,BoCW Financial assistance for marriage for self,-1.0,memberlabourboard3years_yes,registeredcw_yes,"married_yes, upcomingmarriage_yes",1 of 4,0.0
+82,BoCW Financial assistance for marriage for self,0.25,,registeredcw_yes,"memberlabourboard3years_yes, married_yes, upcomingmarriage_yes",1 of 4,0.0
+83,BoCW Financial assistance for marriage for self,-1.0,memberlabourboard3years_yes,registeredcw_yes,"married_yes, upcomingmarriage_yes",1 of 4,0.0
+84,BoCW Financial assistance for marriage for self,0.5,,"registeredcw_yes, married_yes","memberlabourboard3years_yes, upcomingmarriage_yes",2 of 4,0.0
+85,BoCW Financial assistance for marriage for self,0.25,,registeredcw_yes,"memberlabourboard3years_yes, married_yes, upcomingmarriage_yes",1 of 4,0.0
+86,BoCW Financial assistance for marriage for self,0.25,,registeredcw_yes,"memberlabourboard3years_yes, married_yes, upcomingmarriage_yes",1 of 4,0.0
+87,BoCW Financial assistance for marriage for self,-1.0,memberlabourboard3years_yes,"registeredcw_yes, married_yes",upcomingmarriage_yes,2 of 4,0.0
+88,BoCW Financial assistance for marriage for self,-1.0,memberlabourboard3years_yes,,"registeredcw_yes, married_yes, upcomingmarriage_yes",0 of 4,0.0
+89,BoCW Financial assistance for marriage for self,-1.0,memberlabourboard3years_yes,,"registeredcw_yes, married_yes, upcomingmarriage_yes",0 of 4,0.0
+90,BoCW Financial assistance for marriage for self,-1.0,memberlabourboard3years_yes,"registeredcw_yes, married_yes",upcomingmarriage_yes,2 of 4,0.0
+91,BoCW Financial assistance for marriage for self,-1.0,memberlabourboard3years_yes,"registeredcw_yes, married_yes",upcomingmarriage_yes,2 of 4,0.0
+92,BoCW Financial assistance for marriage for self,0.25,,married_yes,"registeredcw_yes, memberlabourboard3years_yes, upcomingmarriage_yes",1 of 4,0.0
+93,BoCW Financial assistance for marriage for self,-1.0,memberlabourboard3years_yes,"registeredcw_yes, married_yes",upcomingmarriage_yes,2 of 4,0.0
+94,BoCW Financial assistance for marriage for self,-1.0,memberlabourboard3years_yes,"registeredcw_yes, married_yes",upcomingmarriage_yes,2 of 4,0.0
+95,BoCW Financial assistance for marriage for self,-1.0,memberlabourboard3years_yes,"registeredcw_yes, married_yes",upcomingmarriage_yes,2 of 4,0.0
+96,BoCW Financial assistance for marriage for self,-1.0,memberlabourboard3years_yes,registeredcw_yes,"married_yes, upcomingmarriage_yes",1 of 4,0.0
+97,BoCW Financial assistance for marriage for self,-1.0,memberlabourboard3years_yes,"registeredcw_yes, married_yes",upcomingmarriage_yes,2 of 4,0.0
+98,BoCW Financial assistance for marriage for self,0.5,,"registeredcw_yes, married_yes","memberlabourboard3years_yes, upcomingmarriage_yes",2 of 4,0.0
+99,BoCW Financial assistance for marriage for self,-1.0,memberlabourboard3years_yes,,"registeredcw_yes, married_yes, upcomingmarriage_yes",0 of 4,0.0
+100,BoCW Financial assistance for marriage for self,-1.0,memberlabourboard3years_yes,registeredcw_yes,"married_yes, upcomingmarriage_yes",1 of 4,0.0
