@@ -1,0 +1,116 @@
+AWSTemplateFormatVersion : '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  # Lambdas 
+  iapowerlivescoring:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: ia_power_live_scoring.lambda_handler
+      FunctionName: "ia_power_live_scoring_staging"
+      Runtime: python3.8
+      CodeUri: aws/lambdas/ia_power_live_scoring
+      Role: !GetAtt IATestDevRole.Arn
+      MemorySize: 3000
+      Timeout: 30
+      Layers:
+       - arn:aws:lambda:ap-south-1:631267018583:layer:AWSLambda-Python38-SciPy1x:29
+       - !Sub arn:aws:lambda:ap-south-1:${AWS::AccountId}:layer:ia_etl_yaml:2
+       - !Sub arn:aws:lambda:ap-south-1:${AWS::AccountId}:layer:ia-power-layer:4
+      Events:
+       PostMessage:
+            Type: HttpApi
+            Properties:
+              ApiId: !Ref IAAPI
+              Method: POST
+              Path: /messages
+
+  iapowerauthorizer:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: power_authorizer.lambda_handler
+      FunctionName: "ia_power_authorizer_staging"
+      Runtime: python3.8
+      CodeUri: aws/lambdas/authorizer/
+      Role: !GetAtt IATestDevRole.Arn
+      MemorySize: 3000
+      Timeout: 30
+
+  # APIs
+  IAAPI:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: ia-live-scoring-staging
+      StageName: staging
+      OpenApiVersion: 3.0.1
+      Auth:
+        ApiKeyRequired: true
+      DefinitionBody: 
+        openapi: 3.0.1
+        info:
+          title: IA Live Scoring API Staging
+        paths:
+          /messages:
+            post:
+              summary: Endpoint for eligibility scoring
+              description: |
+                Invokes scoring functions
+              responses:
+                "200":
+                  description: returns response
+                "400":
+                  description: bad input parameter
+              x-amazon-apigateway-integration:
+                uri:
+                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${iapowerlivescoring.Arn}/invocations
+                responses:
+                  default:
+                    statusCode: "200"
+                passthroughBehavior: when_no_match
+                httpMethod: POST
+                contentHandling: CONVERT_TO_TEXT
+                type: aws_proxy
+
+
+  # Layers
+  AwsServices:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: ia-power-layer-staging
+      Description: layer with special functions for ia power project
+      ContentUri: aws/layers/iapowerlayer
+      CompatibleRuntimes:
+        - python3.8
+      LicenseInfo: MIT
+      RetentionPolicy: Retain
+
+  # Roles
+  IATestDevRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub lambda-role-${AWS::StackName}
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: S3FullAccessPolicy
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action: 's3:*'
+                Resource: [
+                  "arn:aws:s3:::ia-dev-sandbox/*", 
+                  "arn:aws:s3:::ia-dev-sandbox", 
+                  "arn:aws:s3:::ia-staging-sandbox/*", 
+                  "arn:aws:s3:::ia-staging-sandbox"
+                  ]
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+        - arn:aws:iam::aws:policy/AWSStepFunctionsFullAccess
+        - arn:aws:iam::aws:policy/AmazonSESFullAccess
+        - arn:aws:iam::aws:policy/AmazonSNSFullAccess
+  

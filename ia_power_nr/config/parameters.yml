@@ -1,0 +1,110 @@
+save_intermediate_datasets: True
+
+sample_beneficiary_pii:
+  age_mte_18: age
+  bpl_yes: isBPL
+  gender_female: gender
+  
+
+bq_project_name: indus-dw-sb1
+
+bocw_useful_columns:
+- Date of Birth
+- Gender
+- Spouse Name
+- Date of Retirement
+- Category
+- Married Status
+- Period of Membership
+- "Valid Upto/ Next Renewal Date "
+
+bocw_target_columns:
+- age:
+   source: Date of Birth
+   source_dtype: datetime
+   func: date_to_age
+   args:
+- gender_female:
+   source: Gender
+   source_dtype: str
+   func: flag_convert
+   args: "F"
+- 90dayscw_yes:
+   source:
+   source_dtype: NA
+   func:
+- registeredcw_yes:
+   source:
+   source_dtype: NA
+   func:
+- memberlabourboard3years_yes:
+   source: Period of Membership
+   source_dtype: timedelta
+   func: period_to_years 
+   args: 3
+- memberlabourboard1year_yes:
+   source: Period of Membership
+   source_dtype: timedelta
+   func: period_to_years
+   args: 1
+- marriedtocw_yes:
+   source: Married Status
+   source_dtype: str
+   func: term_match
+   args: "Married"
+- married_yes:
+   source: Married Status
+   source_dtype: str
+   func: term_match
+   args: "Married"
+- permanentdisability_yes:
+   source: Category
+   source_dtype: str
+   func: term_match
+   args: "Challenged"
+- widow_yes:
+   source: Married Status
+   source_dtype: str
+   func: term_match
+   args: "Widow"
+
+# Matrix completion parameters
+bayesian_mc_params:
+  adapt_delta: 0.85
+  max_treedepth: 15
+
+n_latent_features: 2
+scale_mean: False
+scale_std: True
+
+!!str stan_code_mc: |
+  data {
+    int<lower=0> n_beneficiaries;               // Number of beneficiaries
+    int<lower=0> n_demographics;                // Number of demographics
+    int<lower=0> n_features;                    // Number of features
+    int<lower=1> n_entries;                     // Number of entries in matrix
+    int<lower=0,upper=n_beneficiaries> ii[n_entries];   // Observations of beneficiaries
+    int<lower=0,upper=n_demographics> jj[n_entries];  // Observations of demographics
+    vector[n_entries] demo_value;
+  }
+
+  parameters {
+    matrix<lower=0>[n_demographics, n_features] W;
+    matrix<lower=0>[n_beneficiaries, n_features] Z;
+    real beta;
+  }
+
+  model {
+    for (n in 1:n_entries) {
+       demo_value[n] ~ normal(W[jj[n],:] * Z[ii[n],:]', 1/sqrt(beta));
+    }
+    // Priors
+    beta ~ gamma(1.5, 1);
+    for (n in 1:n_beneficiaries) {
+       Z[n,:] ~  exponential(1);
+    }
+    for (n in 1:n_demographics) {
+       W[n,:] ~ exponential(1);
+    }
+  }
+
