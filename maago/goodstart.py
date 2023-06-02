@@ -108,7 +108,7 @@ def main():
     for beneficiary in CSVLoader('survey.csv'):
         beneficiaries.append(beneficiary)
     print('%d beneficiaries' % len(beneficiaries))
-    #
+    # preprocess the beneficiary data
     scheme = random.choice(schemes)
     beneficiary = random.choice(beneficiaries)
     match(beneficiary, scheme)

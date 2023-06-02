@@ -1,0 +1,59 @@
+bocw_useful_columns:
+- Date of Birth
+- Gender
+- Spouse Name
+- Date of Retirement
+- Category
+- Married Status
+- Period of Membership
+- "Valid Upto/ Next Renewal Date "
+
+bocw_target_columns:
+- age:
+   source: Date of Birth
+   source_dtype: datetime
+   func: date_to_age
+   args:
+- gender_female:
+   source: Gender
+   source_dtype: str
+   func: flag_convert
+   args: "F"
+- 90dayscw_yes:
+   source:
+   source_dtype: NA
+   func:
+- registeredcw_yes:
+   source:
+   source_dtype: NA
+   func:
+- memberlabourboard3years_yes:
+   source: Period of Membership
+   source_dtype: timedelta
+   func: period_to_years 
+   args: 3
+- memberlabourboard1year_yes:
+   source: Period of Membership
+   source_dtype: timedelta
+   func: period_to_years
+   args: 1
+- marriedtocw_yes:
+   source: Married Status
+   source_dtype: str
+   func: term_match
+   args: "Married"
+- married_yes:
+   source: Married Status
+   source_dtype: str
+   func: term_match
+   args: "Married"
+- permanentdisability_yes:
+   source: Category
+   source_dtype: str
+   func: term_match
+   args: "Challenged"
+- widow_yes:
+   source: Married Status
+   source_dtype: str
+   func: term_match
+   args: "Widow"
