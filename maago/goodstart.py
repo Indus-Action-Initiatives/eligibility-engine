@@ -37,6 +37,7 @@ class CSVLoader:
             tmp = []
             for header in headers:
                 h = header[i].strip()
+                # print(h)
                 if h:
                     tmp.append(h)
             if useLastHeader:
@@ -63,7 +64,7 @@ IDiSchemeSubDiv = 'IDi scheme sub-divisions'
 def LoadSchemes():
     schemes = []
     n = 0
-    for scheme in CSVLoader('benefitsCG.csv', numHeader=2):
+    for scheme in CSVLoader('maago/benefitsCG.csv', numHeader=2):
         n += 1
         if (scheme[State] == 'Chhattisgarh'
           and scheme[Sector] == 'Right to Livelihood'
@@ -97,21 +98,64 @@ def match(beneficiary, scheme):
     for k, v in scheme.items():
         if v.strip():
             print('    %s = %s' % (normalizeString(k), normalizeString(v)))
-    print('beneficiary attributes:')
+    print('beneficiary attributes (total %d):' % len(beneficiary))
+    for k,v in beneficiary.items():
+        print('        %s' % (normalizeString(k)))
     for k, v in beneficiary.items():
         if v.strip():
             print('    %s = %s' % (normalizeString(k), normalizeString(v)))
 
+entities = {
+        "id": [],
+        "family": [],
+        "respondent": [],
+        "familyMember": [],
+    }
+
+def getEntityForHeader(header):
+    entity = "family"
+    for k, v in entities.items():
+        if header in v:
+            entity = k
+            break
+    return entity 
+    
 def main():
     schemes = LoadSchemes()
     beneficiaries = []
-    for beneficiary in CSVLoader('survey.csv'):
+    
+
+    structured_beneficiaries = []
+
+    for beneficiary in CSVLoader('maago/survey_data_may.csv'):
         beneficiaries.append(beneficiary)
     print('%d beneficiaries' % len(beneficiaries))
+
+    # Get the headers. Segregate into the following entities:
+    # 1. family
+    # 2. respondent
+    # 3. familyMember
+    for row in CSVLoader('maago/headers_to_entities.csv'):
+        entities[row["entity"]].append(row["header"])
+
+    # For each beneficiary, create a structured (family) object out of it divided as family, respondent and family member data
+    for beneficiary in beneficiaries:
+        structured_beneficiary = {"id": "", "family": {}, "respondent": {}, "familyMember": {}}
+        # hack for id: id has only one entry right now, this may change later, deal with it then
+        structured_beneficiary['id'] = beneficiary[entities['id'][0]]
+        for k, v in beneficiary.items():
+            entity = getEntityForHeader(k)
+            if entity == 'id':
+                continue
+            structured_beneficiary[entity][k] = v
+        print(structured_beneficiary)
+        break
+
     # preprocess the beneficiary data
+    # beneficiaries = preprocessBeneficiaries(beneficiaries)
     scheme = random.choice(schemes)
     beneficiary = random.choice(beneficiaries)
-    match(beneficiary, scheme)
+    #match(beneficiary, scheme)
     return 0
 
 if __name__ == '__main__':
