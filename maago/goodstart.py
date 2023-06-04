@@ -118,38 +118,115 @@ def getEntityForHeader(header):
         if header in v:
             entity = k
             break
-    return entity 
+    return entity
+
+"""
+        type Location struct {
+            type: string;
+            locality: string;
+            pincode: string;
+            wardNumber: int;
+            wardName: string;
+            village: string;
+            surveyVillageTownCity: string;
+        }
+
+        type FamilyMember struct {
+            name: string;
+            dob: date;
+            gender: string;
+            familyRole: string;
+            job: string;
+            jobType: string;
+            jobID: int;            
+            inEducationalInstitute: bool;
+            educationLevel: string;
+            prevYearTenth: bool;
+            prevYearTwelfth: bool;
+            tenthPercentageMarks: float;
+            twelfthPercentageMarks: float;
+            tenthTopTen: bool;
+            twelfthTopTen: bool;
+            hasBOCWCard: bool;
+            bocwCardIssueDate: date;
+            hasUOWCard: bool;
+            uowCardIssueDate: date;
+        }
+
+        type Family struct {
+            id: string;
+            caste: string;
+            casteCategory: string;
+            PRofCG: bool;
+            hasResidenceCertificate: bool;
+            rationCardType: string;
+            ptgoOrPVTG: bool;
+            areForestDwellers: bool;
+            hasPhone: bool;
+            hasNeighbourPhoneNumber: bool;
+            location: Location;
+            members: []FamilyMember;
+        }
+        """
+
+mappedHeaders = {}
+# BAD CODE: FIX LATER
+# Following functions assume that mappedHeaders is populated
+
+# TODO: Add type conversion
+def lookupBeneficiary(beneficiary, key):
+    value = ""
+
+    if key in mappedHeaders.keys():
+        value = beneficiary[mappedHeaders[key]['dataHeader']]
+    
+    return value
+
+def newFamily(beneficiary):
+    family = {}
+    familyHeaders = ["id", "caste", "casteCategory", "PRofCG", "hasResidenceCertificate", "rationCardType", "ptgoOrPVTG", 
+                    "areForestDwellers", "hasPhone"]    
+
+    for header in familyHeaders:
+        family[header] = lookupBeneficiary(beneficiary, header)
+
+    return family
     
 def main():
     schemes = LoadSchemes()
     beneficiaries = []
+    family = []
     
-
-    structured_beneficiaries = []
-
     for beneficiary in CSVLoader('maago/survey_data_may.csv'):
         beneficiaries.append(beneficiary)
     print('%d beneficiaries' % len(beneficiaries))
 
-    # Get the headers. Segregate into the following entities:
-    # 1. family
-    # 2. respondent
-    # 3. familyMember
-    for row in CSVLoader('maago/headers_to_entities.csv'):
-        entities[row["entity"]].append(row["header"])
+    # # Get the headers. Segregate into the following entities:
+    # # 1. family
+    # # 2. respondent
+    # # 3. familyMember
+    # for row in CSVLoader('maago/headers_to_entities.csv'):
+    #     entities[row["entity"]].append(row["header"])
+
+    # map headers to readable ones using a config csv
+    for header in CSVLoader('maago/map_headers.csv'):
+        mappedHeaders[header['readableHeader']] = {'dataHeader': header['dataHeader'], 'dataType': header['dataType']}
 
     # For each beneficiary, create a structured (family) object out of it divided as family, respondent and family member data
     for beneficiary in beneficiaries:
-        structured_beneficiary = {"id": "", "family": {}, "respondent": {}, "familyMember": {}}
-        # hack for id: id has only one entry right now, this may change later, deal with it then
-        structured_beneficiary['id'] = beneficiary[entities['id'][0]]
-        for k, v in beneficiary.items():
-            entity = getEntityForHeader(k)
-            if entity == 'id':
-                continue
-            structured_beneficiary[entity][k] = v
-        print(structured_beneficiary)
+        # For each beneficiary row construct a family object
+        family = newFamily(beneficiary);
+        print(family)
         break
+        # # hack for id: id has only one entry right now, this may change later, deal with it then
+        # structured_beneficiary['id'] = beneficiary[entities['id'][0]]
+        # for k, v in beneficiary.items():
+        #     entity = getEntityForHeader(k)
+        #     if entity == 'id':
+        #         continue
+        #     structured_beneficiary[entity][k] = v
+        # print(structured_beneficiary["family"])
+        # break
 
     # preprocess the beneficiary data
     # beneficiaries = preprocessBeneficiaries(beneficiaries)
