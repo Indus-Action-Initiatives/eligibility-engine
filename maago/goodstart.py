@@ -37,7 +37,6 @@ class CSVLoader:
             tmp = []
             for header in headers:
                 h = header[i].strip()
-                # print(h)
                 if h:
                     tmp.append(h)
             if useLastHeader:
@@ -136,6 +135,7 @@ def getEntityForHeader(header):
             dob: date;
             gender: string;
             familyRole: string;
+            disabled: bool;
             job: string;
             jobType: string;
             jobID: int;            
@@ -169,67 +169,142 @@ def getEntityForHeader(header):
         }
         """
 
-mappedHeaders = {}
+familyMapping = {}
+locationMapping = {}
+respondentMapping = {}
+familyMembersMapping = {}
 # BAD CODE: FIX LATER
-# Following functions assume that mappedHeaders is populated
+# Following functions assume that the mappings above are already populated populated
 
-# TODO: Add type conversion
-def lookupBeneficiary(beneficiary, key):
-    value = ""
+def getMappedDict(headerMapping, srcDict):
+    destDict = {}
 
-    if key in mappedHeaders.keys():
-        value = beneficiary[mappedHeaders[key]['dataHeader']]
+    for key in headerMapping.keys():       
+        if key in srcDict.keys():
+            # TODO: Use typecasting
+            destDict[headerMapping[key]["dest"]] = srcDict[key]
     
-    return value
+    return destDict
+
+
+# # TODO: Add type conversion
+# def lookupBeneficiary(beneficiary, key):
+#     value = ""
+
+#     if key in mappedHeaders.keys():
+#         value = beneficiary[mappedHeaders[key]['dataHeader']]
+    
+#     return value
+
+# fm##1$$job
+FAMILY_MEMBER_INDIVIDUAL_SEPARATOR = "##"
+FAMILY_MEMBER_ATTRIBUTE_SEPARATOR = "$$"
+# We probably don't need this. TODO: Remove if necessary.
+# We are doing this so that no data is missed if any of he property is missing
+MAXIMUM_NUMBER_OF_FAMILY_MEMBERS = 6
+
+def splitFamilyMembersCombinedDict(familyMembersCombinedDict):
+    otherFamilyMembers = []
+
+    for i in range(MAXIMUM_NUMBER_OF_FAMILY_MEMBERS):
+        otherFamilyMembers.append({})
+
+    for key, value in familyMembersCombinedDict.items():
+        idPlusAttribute = key.split(FAMILY_MEMBER_INDIVIDUAL_SEPARATOR)[1]
+        idPlusAttribute = idPlusAttribute.split(FAMILY_MEMBER_ATTRIBUTE_SEPARATOR)
+        id = int(idPlusAttribute[0]) - 1
+        attribute = idPlusAttribute[1]        
+        otherFamilyMembers[id][attribute] = value
+
+    return otherFamilyMembers
 
 def newFamily(beneficiary):
-    family = {}
-    familyHeaders = ["id", "caste", "casteCategory", "PRofCG", "hasResidenceCertificate", "rationCardType", "ptgoOrPVTG", 
-                    "areForestDwellers", "hasPhone"]    
+    # create a new family
+    family = getMappedDict(familyMapping, beneficiary)
 
-    for header in familyHeaders:
-        family[header] = lookupBeneficiary(beneficiary, header)
+    # assign location to the family
+    location = getMappedDict(locationMapping, beneficiary)
+    family['location'] = location
+
+    # get respondent
+    respondent = getMappedDict(respondentMapping, beneficiary)
+
+    # TODO: Handle other job
+    # add other family members
+    familyMembersCombinedDict = getMappedDict(familyMembersMapping, beneficiary)
+
+    # split the dict into various family members array
+    family['members'] = splitFamilyMembersCombinedDict(familyMembersCombinedDict)
+
+    # Figure out family roles of the members based on relationship with the respondent
+    parentFound = False
+    for member in family['members']:
+        familyRole = 'unknown'
+        relationshipWithRespondent = member['relationshipWithRespondent']        
+
+        if relationshipWithRespondent == 'father':
+            familyRole = 'father'
+            parentFound = True
+        elif relationshipWithRespondent == 'mother':
+            familyRole = 'mother'
+            parentFound = True
+        elif relationshipWithRespondent in ['brother', 'sister', 'sibling']:
+            familyRole = 'child'
+        elif "in-law" in relationshipWithRespondent:
+            familyRole = 'in-law'
+        
+        member['familyRole'] = familyRole
+
+    # figure out family role the respondent using the family roles of other members
+    respondentFamilyRole = 'unknown'
+    if not parentFound:
+       if respondent['gender'] == 'male':
+           respondentFamilyRole = 'father'
+       elif respondent['familyRole'] == 'female':
+           respondentFamilyRole = 'mother'
+    else:
+        respondentFamilyRole = 'child'
+
+    respondent['familyRole'] = respondentFamilyRole
+
+    # add respondent to the family member
+    family['members'].append(respondent)   
 
     return family
+
+def getMappingFromCSVLoaderResponse(resp):
+    retVal = {}
+
+    for row in resp:
+        retVal[row['src']] = {'dest': row['dest'], 'dataType': row['dataType']}
+
+    return retVal
     
 def main():
     schemes = LoadSchemes()
     beneficiaries = []
-    family = []
+    families = []
     
     for beneficiary in CSVLoader('maago/survey_data_may.csv'):
         beneficiaries.append(beneficiary)
     print('%d beneficiaries' % len(beneficiaries))
 
-    # # Get the headers. Segregate into the following entities:
-    # # 1. family
-    # # 2. respondent
-    # # 3. familyMember
-    # for row in CSVLoader('maago/headers_to_entities.csv'):
-    #     entities[row["entity"]].append(row["header"])
-
-    # map headers to readable ones using a config csv
-    for header in CSVLoader('maago/map_headers.csv'):
-        mappedHeaders[header['readableHeader']] = {'dataHeader': header['dataHeader'], 'dataType': header['dataType']}
-
+    # get various mappings
+    global familyMapping
+    global locationMapping
+    global respondentMapping
+    global familyMembersMapping
+    familyMapping = getMappingFromCSVLoaderResponse(CSVLoader('maago/familyMapping.csv'))
+    locationMapping = getMappingFromCSVLoaderResponse(CSVLoader('maago/locationMapping.csv'))
+    respondentMapping = getMappingFromCSVLoaderResponse(CSVLoader('maago/respondentMapping.csv'))
+    familyMembersMapping = getMappingFromCSVLoaderResponse(CSVLoader('maago/familyMembersMapping.csv'))
+   
     # For each beneficiary, create a structured (family) object out of it divided as family, respondent and family member data
     for beneficiary in beneficiaries:
         # For each beneficiary row construct a family object
         family = newFamily(beneficiary);
-        print(family)
-        break
-        # # hack for id: id has only one entry right now, this may change later, deal with it then
-        # structured_beneficiary['id'] = beneficiary[entities['id'][0]]
-        # for k, v in beneficiary.items():
-        #     entity = getEntityForHeader(k)
-        #     if entity == 'id':
-        #         continue
-        #     structured_beneficiary[entity][k] = v
-        # print(structured_beneficiary["family"])
-        # break
+        families.append(family)
 
-    # preprocess the beneficiary data
-    # beneficiaries = preprocessBeneficiaries(beneficiaries)
     scheme = random.choice(schemes)
     beneficiary = random.choice(beneficiaries)
     #match(beneficiary, scheme)
