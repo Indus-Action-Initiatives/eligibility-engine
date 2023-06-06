@@ -63,7 +63,7 @@ IDiSchemeSubDiv = 'IDi scheme sub-divisions'
 def LoadSchemes():
     schemes = []
     n = 0
-    for scheme in CSVLoader('maago/benefitsCG.csv', numHeader=2):
+    for scheme in CSVLoader('maago/config/benefitsCG.csv', numHeader=2):
         n += 1
         if (scheme[State] == 'Chhattisgarh'
           and scheme[Sector] == 'Right to Livelihood'
@@ -260,7 +260,7 @@ def newFamily(beneficiary):
     if not parentFound:
        if respondent['gender'] == 'male':
            respondentFamilyRole = 'father'
-       elif respondent['familyRole'] == 'female':
+       elif respondent['gender'] == 'female':
            respondentFamilyRole = 'mother'
     else:
         respondentFamilyRole = 'child'
@@ -285,7 +285,7 @@ def main():
     beneficiaries = []
     families = []
     
-    for beneficiary in CSVLoader('maago/survey_data_may.csv'):
+    for beneficiary in CSVLoader('maago/data/survey_data_may.csv'):
         beneficiaries.append(beneficiary)
     print('%d beneficiaries' % len(beneficiaries))
 
@@ -294,10 +294,10 @@ def main():
     global locationMapping
     global respondentMapping
     global familyMembersMapping
-    familyMapping = getMappingFromCSVLoaderResponse(CSVLoader('maago/familyMapping.csv'))
-    locationMapping = getMappingFromCSVLoaderResponse(CSVLoader('maago/locationMapping.csv'))
-    respondentMapping = getMappingFromCSVLoaderResponse(CSVLoader('maago/respondentMapping.csv'))
-    familyMembersMapping = getMappingFromCSVLoaderResponse(CSVLoader('maago/familyMembersMapping.csv'))
+    familyMapping = getMappingFromCSVLoaderResponse(CSVLoader('maago/config/familyMapping.csv'))
+    locationMapping = getMappingFromCSVLoaderResponse(CSVLoader('maago/config/locationMapping.csv'))
+    respondentMapping = getMappingFromCSVLoaderResponse(CSVLoader('maago/config/respondentMapping.csv'))
+    familyMembersMapping = getMappingFromCSVLoaderResponse(CSVLoader('maago/config/familyMembersMapping.csv'))
    
     # For each beneficiary, create a structured (family) object out of it divided as family, respondent and family member data
     for beneficiary in beneficiaries:
