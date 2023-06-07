@@ -1,0 +1,8 @@
+src,dest,dataType
+data.preSurveyInfoContainer.surveyAreaType,areaType,string
+data.preSurveyInfoContainer.tolaAreaLocality,areaLocality,string
+data.preSurveyInfoContainer.pinCode,pinCode,string
+data.preSurveyInfoContainer.wardName,wardName,string
+data.preSurveyInfoContainer.wardNumber,wardNumber,string
+data.preSurveyInfoContainer.village,village,string
+data.preSurveyInfoContainer.surveyVillageTownCity,surveyVillageTownCity,string

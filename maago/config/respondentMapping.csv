@@ -1,0 +1,12 @@
+src,dest,dataType
+data.respondentDetailsContainer.respondentFullName,name,string
+data.respondentDetailsContainer.respondentGender,gender,string
+data.respondentDetailsContainer.respondentDateOfBirth,dob,date
+data.respondentJobContainer.respondentJob,job,string
+data.respondentJobContainer.respondentJobOther,jobOther,string
+data.respondentJobContainer.isInEducationalInsitution,inEducationalInstitute,bool
+data.respondentJobContainer.studentEducationLevel,educationalLevel,string
+data.unorganisedWorkerDetailsContainer.hasUOWCard,hasUOWCard,bool
+data.unorganisedWorkerDetailsContainer.uowCardIssueDate,uowCardIssueDate,date
+data.constructionWorkerDetailsContainer.hasBOCWCard,hasBOCWCard,bool
+data.constructionWorkerDetailsContainer.bocwCardIssueDate,bocwCardIssueDate,date
