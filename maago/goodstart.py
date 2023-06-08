@@ -6,7 +6,9 @@
 import csv
 import random
 import sys
-
+import mysql.connector
+from mysql.connector import Error
+from common.util import GetAlphaNumericString
 class SimpleCSVLoader:
     # single header row
     def __init__(self, filename):
@@ -121,8 +123,8 @@ def getEntityForHeader(header):
 
 """
         type Location struct {
-            type: string;
-            locality: string;
+            areaType: string;
+            areaLocality: string;
             pincode: string;
             wardNumber: int;
             wardName: string;
@@ -279,7 +281,37 @@ def getMappingFromCSVLoaderResponse(resp):
         retVal[row['src']] = {'dest': row['dest'], 'dataType': row['dataType']}
 
     return retVal
+
+def pushToDB(dbConnection, families):
+    cursor = dbConnection.cursor()
+    print("starting to push %d families to db..." % len(families))
+    for f in families:
+        # TODO: Check if the location exists before inserting the location
+        # Create location for the row, get the location ID
+        fLocation = f['location']
+        locationID = GetAlphaNumericString(8)
+
+        # HACK: Zero out empty strings for numeric columns
+        if fLocation['pincode'] == '':
+            fLocation['pincode'] = '0'
+        if fLocation['wardNumber'] == '':
+            fLocation['wardNumber'] = '0'
+
+        createLocationQuery = """INSERT INTO locations (id, location_type, locality, pincode, ward_number, ward_name, village, survey_village_town_city) VALUES ('%s', '%s', '%s', %s, %s, '%s', '%s', '%s');""" % (locationID, fLocation['areaType'], fLocation['areaLocality'], fLocation['pincode'], fLocation['wardNumber'], 
+               fLocation['wardName'], fLocation['village'], fLocation['surveyVillageTownCity'])
+        
+        cursor.execute(createLocationQuery)
+        print(cursor.lastrowid)
+
+        # Create family for the row, get the family ID
+
+
+        # Create family members
+
+    # close the cursor
+    cursor.close()
     
+
 def main():
     schemes = LoadSchemes()
     beneficiaries = []
@@ -287,6 +319,7 @@ def main():
     
     for beneficiary in CSVLoader('maago/data/survey_data_may.csv'):
         beneficiaries.append(beneficiary)
+        break
     print('%d beneficiaries' % len(beneficiaries))
 
     # get various mappings
@@ -305,9 +338,31 @@ def main():
         family = newFamily(beneficiary);
         families.append(family)
 
+    # TODO: get connection on demand
+    dbConnection = mysql.connector.connect(
+        host='localhost',
+        user='maago',
+        passwd='maagoindus',
+        db='ee'
+    )
+    try:
+        if dbConnection.is_connected():
+            print("connected to the mysql db")           
+    except Error as e:
+        print("error: ", e)
+
+    # Push data in mysql db
+    pushToDB(dbConnection, families)
+
     scheme = random.choice(schemes)
     beneficiary = random.choice(beneficiaries)
     #match(beneficiary, scheme)
+
+    # commit db transactions
+    dbConnection.commit()
+
+    dbConnection.close()
+
     return 0
 
 if __name__ == '__main__':
