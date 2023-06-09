@@ -1,7 +1,7 @@
 CREATE TABLE family_members (
     id VARCHAR(8),
-    family_id VARCHAR(8),
-    dob DATE,
+    family_id VARCHAR(32),
+    dob DATE NULL DEFAULT NULL,
     gender ENUM('male', 'female', 'other'),
     family_role ENUM('grandparent', 'father', 'mother', 'child', 'in-law', 'other'),
     disadvantaged ENUM('true', 'false', 'unknown'),
@@ -16,9 +16,9 @@ CREATE TABLE family_members (
     tenth_top_ten ENUM('true', 'false', 'unknown'),
     twelfth_top_ten ENUM('true', 'false', 'unknown'),
     has_bocw_card ENUM('true', 'false', 'unknown'),
-    bocw_card_issue_date DATE,
+    bocw_card_issue_date DATE NULL DEFAULT NULL,
     has_uow_card ENUM('true', 'false', 'unknown'),
-    uow_card_issue_date DATE,
+    uow_card_issue_date DATE NULL DEFAULT NULL,
     PRIMARY KEY (id),
     FOREIGN KEY (family_id) REFERENCES families(id)
 );

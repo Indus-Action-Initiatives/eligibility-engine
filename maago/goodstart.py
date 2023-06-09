@@ -8,7 +8,7 @@ import random
 import sys
 import mysql.connector
 from mysql.connector import Error
-from common.util import GetAlphaNumericString, GetNormalisedValue
+from common.util import GetAlphaNumericString, GetNormalisedValue, GetDBDateString, GetDBFloatString
 
 class SimpleCSVLoader:
     # single header row
@@ -138,10 +138,9 @@ def getEntityForHeader(header):
             dob: date;
             gender: string;
             familyRole: string;
-            disabled: bool;
+            disadvantaged: bool;
             job: string;
             jobType: string;
-            jobID: int;            
             inEducationalInstitute: bool;
             educationLevel: string;
             prevYearTenth: bool;
@@ -270,6 +269,16 @@ def newFamily(beneficiary):
 
     respondent['familyRole'] = respondentFamilyRole
 
+    # no data regarding some of the respondent's field. use unknown
+    respondent['disadvantaged'] = 'unknown'
+    respondent['prevYearTenth'] = 'unknown'
+    respondent['prevYearTwelfth'] = 'unknown'
+    respondent['tenthTopTen'] = 'unknown'
+    respondent['twelfthTopTen'] = 'unknown'
+    respondent['jobType'] = 'unknown'
+    respondent['tenthPercentageMarks'] = GetDBFloatString('-1')
+    respondent['twelfthPercentageMarks'] = GetDBFloatString('-1')
+
     # add respondent to the family member
     family['members'].append(respondent)   
 
@@ -320,6 +329,85 @@ def pushToDB(dbConnection, families):
         cursor.execute(createFamilyQuery)
 
         # Create family members
+        familyMembers = f['members']
+        for m in familyMembers:
+            # Treat name as the primary key in data
+            if m['name'] == '':
+                continue
+            memberID = GetAlphaNumericString(8)
+
+            # calculate boolean columns
+            # disadvantaged, inEducationalInstitute, prevYearTenth, prevYearTwelfth
+            # tenthTopTen, twelfthTopTen
+            # hasBOCWCard, hasUOWCard
+            disadvantaged = GetNormalisedValue(m['disadvantaged'])
+            inEducationalInstitute = GetNormalisedValue(m['inEducationalInstitute'])
+            prevYearTenth = GetNormalisedValue(m['prevYearTenth'])
+            prevYearTwelfth = GetNormalisedValue(m['prevYearTwelfth'])
+            tenthTopTen = GetNormalisedValue(m['tenthTopTen'])
+            twelfthTopTen = GetNormalisedValue(m['twelfthTopTen'])
+            hasBOCWCard = GetNormalisedValue(m['hasBOCWCard'])
+            hasUOWCard = GetNormalisedValue(m['hasUOWCard'])
+
+            # calculate date columns
+            # dob, bocwCardIssueDate, uowCardIssueDate
+            dob = GetDBDateString(m['dob'])
+            bocwCardIssueDate = GetDBDateString(m['bocwCardIssueDate'])
+            uowCardIssueDate = GetDBDateString(m['uowCardIssueDate'])
+
+            # calculate numerical columns
+            # tenthPercentageMarks, twelfthPercentageMarks
+            tenthPercentageMarks = GetDBFloatString(m['tenthPercentageMarks'])
+            twelfthPercentageMarks = GetDBFloatString(m['twelfthPercentageMarks'])            
+
+            createFamilyMemberQuery = """INSERT INTO family_members (
+                id,
+                family_id,
+                dob,
+                gender,
+                family_role,
+                disadvantaged,
+                job,
+                jobType,
+                in_educational_institute,
+                education_level,
+                prev_year_tenth,
+                prev_year_twelfth,
+                tenth_percentage_marks,
+                twelfth_percentage_marks,
+                tenth_top_ten,
+                twelfth_top_ten,
+                has_bocw_card,
+                bocw_card_issue_date,
+                has_uow_card,
+                uow_card_issue_date                
+            ) VALUES (
+                '%s',
+                '%s',
+                %s,
+                '%s',
+                '%s',
+                '%s',
+                '%s',
+                '%s',
+                '%s',
+                '%s',
+                '%s',
+                '%s',
+                %s,
+                %s,
+                '%s',
+                '%s',
+                '%s',
+                %s,
+                '%s',
+                %s
+            )""" % (memberID, familyID, dob, m['gender'], m['familyRole'], disadvantaged, m['job'],
+                    m['jobType'], inEducationalInstitute, m['educationLevel'], prevYearTenth,
+                    prevYearTwelfth, tenthPercentageMarks, twelfthPercentageMarks, tenthTopTen,
+                    twelfthTopTen, hasBOCWCard, bocwCardIssueDate, hasUOWCard, uowCardIssueDate)
+            
+            cursor.execute(createFamilyMemberQuery)
 
     # close the cursor
     cursor.close()
