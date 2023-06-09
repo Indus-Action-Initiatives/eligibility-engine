@@ -6,6 +6,9 @@
 import csv
 import random
 import sys
+import mysql.connector
+from mysql.connector import Error
+from common.util import GetAlphaNumericString, GetNormalisedValue, GetDBDateString, GetDBFloatString
 
 class SimpleCSVLoader:
     # single header row
@@ -121,8 +124,8 @@ def getEntityForHeader(header):
 
 """
         type Location struct {
-            type: string;
-            locality: string;
+            areaType: string;
+            areaLocality: string;
             pincode: string;
             wardNumber: int;
             wardName: string;
@@ -135,10 +138,9 @@ def getEntityForHeader(header):
             dob: date;
             gender: string;
             familyRole: string;
-            disabled: bool;
+            disadvantaged: bool;
             job: string;
             jobType: string;
-            jobID: int;            
             inEducationalInstitute: bool;
             educationLevel: string;
             prevYearTenth: bool;
@@ -267,6 +269,16 @@ def newFamily(beneficiary):
 
     respondent['familyRole'] = respondentFamilyRole
 
+    # no data regarding some of the respondent's field. use unknown
+    respondent['disadvantaged'] = 'unknown'
+    respondent['prevYearTenth'] = 'unknown'
+    respondent['prevYearTwelfth'] = 'unknown'
+    respondent['tenthTopTen'] = 'unknown'
+    respondent['twelfthTopTen'] = 'unknown'
+    respondent['jobType'] = 'unknown'
+    respondent['tenthPercentageMarks'] = GetDBFloatString('-1')
+    respondent['twelfthPercentageMarks'] = GetDBFloatString('-1')
+
     # add respondent to the family member
     family['members'].append(respondent)   
 
@@ -279,7 +291,128 @@ def getMappingFromCSVLoaderResponse(resp):
         retVal[row['src']] = {'dest': row['dest'], 'dataType': row['dataType']}
 
     return retVal
+
+def pushToDB(dbConnection, families):
+    cursor = dbConnection.cursor()
+    print("starting to push %d families to db..." % len(families))
+    for f in families:
+        # TODO: Check if the location exists before inserting the location
+        # Create location for the row, get the location ID
+        fLocation = f['location']
+        locationID = GetAlphaNumericString(8)
+
+        # HACK: Zero out empty strings for numeric columns
+        if fLocation['pincode'] == '':
+            fLocation['pincode'] = '0'
+        if fLocation['wardNumber'] == '':
+            fLocation['wardNumber'] = '0'
+
+        createLocationQuery = """INSERT INTO locations (id, location_type, locality, pincode, ward_number, ward_name, village, survey_village_town_city) VALUES ('%s', '%s', '%s', %s, %s, '%s', '%s', '%s');""" % (locationID, fLocation['areaType'], fLocation['areaLocality'], fLocation['pincode'], fLocation['wardNumber'], 
+               fLocation['wardName'], fLocation['village'], fLocation['surveyVillageTownCity'])
+        
+        cursor.execute(createLocationQuery)
+
+        # Create family for the row, get the family ID
+        familyID = f['id']
+
+        # calculate boolean columns prOfCG, hasPhone, hasResidenceCertificate, hasNeighbourhoodPhone, ptgoOrPVTG, areForestDwellers
+        prOfCG = GetNormalisedValue(f['prOfCG'])
+        hasPhone = GetNormalisedValue(f['hasPhone'])
+        hasResidenceCertificate = GetNormalisedValue(f['hasResidenceCertificate'])
+        hasNeighbourhoodPhoneNumber = GetNormalisedValue(str(f['neighbourhoodPhone'] != ''))
+        ptgoOrPVTG = GetNormalisedValue(f['ptgoOrPVTG'])
+        areForestDwellers = GetNormalisedValue(f['areForestDwellers'])
+
+        createFamilyQuery = """INSERT INTO families (id, location_id, caste, caste_category, pr_of_cg, has_residence_certificate, ration_card_type, ptgo_or_pvtg, are_forest_dwellers, has_phone, has_neighbourhood_phone_number) VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s')""" % (
+            familyID, locationID, f['caste'],  f['casteCategory'], prOfCG, hasResidenceCertificate, f['rationCardType'], ptgoOrPVTG, areForestDwellers, hasPhone, hasNeighbourhoodPhoneNumber
+        )
+        cursor.execute(createFamilyQuery)
+
+        # Create family members
+        familyMembers = f['members']
+        for m in familyMembers:
+            # Treat name as the primary key in data
+            if m['name'] == '':
+                continue
+            memberID = GetAlphaNumericString(8)
+
+            # calculate boolean columns
+            # disadvantaged, inEducationalInstitute, prevYearTenth, prevYearTwelfth
+            # tenthTopTen, twelfthTopTen
+            # hasBOCWCard, hasUOWCard
+            disadvantaged = GetNormalisedValue(m['disadvantaged'])
+            inEducationalInstitute = GetNormalisedValue(m['inEducationalInstitute'])
+            prevYearTenth = GetNormalisedValue(m['prevYearTenth'])
+            prevYearTwelfth = GetNormalisedValue(m['prevYearTwelfth'])
+            tenthTopTen = GetNormalisedValue(m['tenthTopTen'])
+            twelfthTopTen = GetNormalisedValue(m['twelfthTopTen'])
+            hasBOCWCard = GetNormalisedValue(m['hasBOCWCard'])
+            hasUOWCard = GetNormalisedValue(m['hasUOWCard'])
+
+            # calculate date columns
+            # dob, bocwCardIssueDate, uowCardIssueDate
+            dob = GetDBDateString(m['dob'])
+            bocwCardIssueDate = GetDBDateString(m['bocwCardIssueDate'])
+            uowCardIssueDate = GetDBDateString(m['uowCardIssueDate'])
+
+            # calculate numerical columns
+            # tenthPercentageMarks, twelfthPercentageMarks
+            tenthPercentageMarks = GetDBFloatString(m['tenthPercentageMarks'])
+            twelfthPercentageMarks = GetDBFloatString(m['twelfthPercentageMarks'])            
+
+            createFamilyMemberQuery = """INSERT INTO family_members (
+                id,
+                family_id,
+                dob,
+                gender,
+                family_role,
+                disadvantaged,
+                job,
+                jobType,
+                in_educational_institute,
+                education_level,
+                prev_year_tenth,
+                prev_year_twelfth,
+                tenth_percentage_marks,
+                twelfth_percentage_marks,
+                tenth_top_ten,
+                twelfth_top_ten,
+                has_bocw_card,
+                bocw_card_issue_date,
+                has_uow_card,
+                uow_card_issue_date                
+            ) VALUES (
+                '%s',
+                '%s',
+                %s,
+                '%s',
+                '%s',
+                '%s',
+                '%s',
+                '%s',
+                '%s',
+                '%s',
+                '%s',
+                '%s',
+                %s,
+                %s,
+                '%s',
+                '%s',
+                '%s',
+                %s,
+                '%s',
+                %s
+            )""" % (memberID, familyID, dob, m['gender'], m['familyRole'], disadvantaged, m['job'],
+                    m['jobType'], inEducationalInstitute, m['educationLevel'], prevYearTenth,
+                    prevYearTwelfth, tenthPercentageMarks, twelfthPercentageMarks, tenthTopTen,
+                    twelfthTopTen, hasBOCWCard, bocwCardIssueDate, hasUOWCard, uowCardIssueDate)
+            
+            cursor.execute(createFamilyMemberQuery)
+
+    # close the cursor
+    cursor.close()
     
+
 def main():
     schemes = LoadSchemes()
     beneficiaries = []
@@ -287,6 +420,7 @@ def main():
     
     for beneficiary in CSVLoader('maago/data/survey_data_may.csv'):
         beneficiaries.append(beneficiary)
+        break
     print('%d beneficiaries' % len(beneficiaries))
 
     # get various mappings
@@ -305,9 +439,31 @@ def main():
         family = newFamily(beneficiary);
         families.append(family)
 
+    # TODO: get connection on demand
+    dbConnection = mysql.connector.connect(
+        host='localhost',
+        user='maago',
+        passwd='maagoindus',
+        db='ee'
+    )
+    try:
+        if dbConnection.is_connected():
+            print("connected to the mysql db")           
+    except Error as e:
+        print("error: ", e)
+
+    # Push data in mysql db
+    pushToDB(dbConnection, families)
+
     scheme = random.choice(schemes)
     beneficiary = random.choice(beneficiaries)
     #match(beneficiary, scheme)
+
+    # commit db transactions
+    dbConnection.commit()
+
+    dbConnection.close()
+
     return 0
 
 if __name__ == '__main__':
