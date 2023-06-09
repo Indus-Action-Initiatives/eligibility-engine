@@ -1,5 +1,5 @@
 CREATE TABLE families (
-    id VARCHAR(8),
+    id VARCHAR(32),
     location_id VARCHAR(8),
     caste VARCHAR(64),
     caste_category VARCHAR(64),

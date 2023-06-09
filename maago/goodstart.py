@@ -8,7 +8,8 @@ import random
 import sys
 import mysql.connector
 from mysql.connector import Error
-from common.util import GetAlphaNumericString
+from common.util import GetAlphaNumericString, GetNormalisedValue
+
 class SimpleCSVLoader:
     # single header row
     def __init__(self, filename):
@@ -301,10 +302,22 @@ def pushToDB(dbConnection, families):
                fLocation['wardName'], fLocation['village'], fLocation['surveyVillageTownCity'])
         
         cursor.execute(createLocationQuery)
-        print(cursor.lastrowid)
 
         # Create family for the row, get the family ID
+        familyID = f['id']
 
+        # calculate boolean columns prOfCG, hasPhone, hasResidenceCertificate, hasNeighbourhoodPhone, ptgoOrPVTG, areForestDwellers
+        prOfCG = GetNormalisedValue(f['prOfCG'])
+        hasPhone = GetNormalisedValue(f['hasPhone'])
+        hasResidenceCertificate = GetNormalisedValue(f['hasResidenceCertificate'])
+        hasNeighbourhoodPhoneNumber = GetNormalisedValue(str(f['neighbourhoodPhone'] != ''))
+        ptgoOrPVTG = GetNormalisedValue(f['ptgoOrPVTG'])
+        areForestDwellers = GetNormalisedValue(f['areForestDwellers'])
+
+        createFamilyQuery = """INSERT INTO families (id, location_id, caste, caste_category, pr_of_cg, has_residence_certificate, ration_card_type, ptgo_or_pvtg, are_forest_dwellers, has_phone, has_neighbourhood_phone_number) VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s')""" % (
+            familyID, locationID, f['caste'],  f['casteCategory'], prOfCG, hasResidenceCertificate, f['rationCardType'], ptgoOrPVTG, areForestDwellers, hasPhone, hasNeighbourhoodPhoneNumber
+        )
+        cursor.execute(createFamilyQuery)
 
         # Create family members
 
