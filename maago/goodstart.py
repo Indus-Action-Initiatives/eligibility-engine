@@ -258,14 +258,15 @@ def newFamily(beneficiary):
         elif "in-law" in relationshipWithRespondent:
             familyRole = 'in-law'
         
-        member['familyRole'] = familyRole
+        member['familyRole'] = familyRole    
 
     # populate pregnancy status
     # get the names of the pregnant women of the family from the pregnancy mapping
     # use fuzzy string matching to figure out which of the family's members are pregnant
     # update the pregnancy status of these family members
     pregnantWomensCombinedDict = getMappedDict(pregnancyMapping, beneficiary)
-    pregnantWomen = splitCombinedDict(pregnantWomensCombinedDict)
+    # current data has a provision of only two pregnant women, so pass two
+    pregnantWomen = splitCombinedDict(pregnantWomensCombinedDict, 2)
     familyMembersNames = []
     for p in pregnantWomen:
         fuzzyScore = -999
@@ -283,6 +284,12 @@ def newFamily(beneficiary):
             family['members'][pIndex]['pregnancy'] = 'yes'
         elif pIndex == (len(family['members']) - 1):
             respondent['pregnancy'] = 'yes'
+
+    for m in (family['members'] + [respondent]):
+        if m['gender'] == 'male':
+            m['pregnancy'] = 'no'
+        elif 'pregnancy' not in m or m['pregnancy'] == '':
+            m['pregnancy'] = 'unknown'
 
     # figure out family role the respondent using the family roles of other members
     respondentFamilyRole = 'unknown'
@@ -375,6 +382,7 @@ def pushToDB(dbConnection, families):
             twelfthTopTen = GetNormalisedValue(m['twelfthTopTen'])
             hasBOCWCard = GetNormalisedValue(m['hasBOCWCard'])
             hasUOWCard = GetNormalisedValue(m['hasUOWCard'])
+            pregnancy = GetNormalisedValue(m['pregnancy'])
 
             # calculate date columns
             # dob, bocwCardIssueDate, uowCardIssueDate
@@ -394,6 +402,7 @@ def pushToDB(dbConnection, families):
                 gender,
                 family_role,
                 disadvantaged,
+                pregnancy,
                 job,
                 jobType,
                 in_educational_institute,
@@ -421,6 +430,7 @@ def pushToDB(dbConnection, families):
                 '%s',
                 '%s',
                 '%s',
+                '%s',
                 %s,
                 %s,
                 '%s',
@@ -429,7 +439,7 @@ def pushToDB(dbConnection, families):
                 %s,
                 '%s',
                 %s
-            )""" % (memberID, familyID, dob, m['gender'], m['familyRole'], disadvantaged, m['job'],
+            )""" % (memberID, familyID, dob, m['gender'], m['familyRole'], disadvantaged, pregnancy, m['job'],
                     m['jobType'], inEducationalInstitute, m['educationLevel'], prevYearTenth,
                     prevYearTwelfth, tenthPercentageMarks, twelfthPercentageMarks, tenthTopTen,
                     twelfthTopTen, hasBOCWCard, bocwCardIssueDate, hasUOWCard, uowCardIssueDate)
