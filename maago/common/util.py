@@ -23,7 +23,15 @@ def GetDBFloatString(s):
 
     return value
 
-# possible values: true, false, unkown
+def GetNormalisedStringValue(s):
+    normalisedValue = 'unknown'
+
+    if s != '':
+        normalisedValue = s
+
+    return normalisedValue
+
+# possible values: true, false, unknown
 def GetNormalisedValue(s):
     normalisedValue = 'unknown'
 

@@ -8,7 +8,7 @@ import random
 import sys
 import mysql.connector
 from mysql.connector import Error
-from common.util import GetAlphaNumericString, GetNormalisedValue, GetDBDateString, GetDBFloatString
+from common.util import GetAlphaNumericString, GetNormalisedValue, GetDBDateString, GetDBFloatString, GetNormalisedStringValue
 from thefuzz import fuzz
 
 class SimpleCSVLoader:
@@ -243,7 +243,12 @@ def newFamily(beneficiary):
 
     # Figure out family roles of the members based on relationship with the respondent
     parentFound = False
-    for member in family['members']:
+
+    # it may happen that the respondent is a parent, in which case we need to keep track
+    # of the husband or wife and use it later to assign proper role
+    wifeIndex = -1
+    husbandIndex = -1
+    for i, member in enumerate(family['members']):
         familyRole = 'unknown'
         relationshipWithRespondent = member['relationshipWithRespondent']        
 
@@ -253,12 +258,31 @@ def newFamily(beneficiary):
         elif relationshipWithRespondent == 'mother':
             familyRole = 'mother'
             parentFound = True
-        elif relationshipWithRespondent in ['brother', 'sister', 'sibling']:
+        elif relationshipWithRespondent in ['child', 'brother', 'sister', 'sibling']:
             familyRole = 'child'
-        elif "in-law" in relationshipWithRespondent:
+        elif "inlaw" in relationshipWithRespondent.replace("-", "").lower():
             familyRole = 'in-law'
-        
-        member['familyRole'] = familyRole    
+        elif relationshipWithRespondent == 'husband':
+            husbandIndex = i
+        elif relationshipWithRespondent == 'wife':
+            wifeIndex = i
+        elif relationshipWithRespondent in ['', 'other']:
+            familyRole = 'other'
+        member['familyRole'] = familyRole
+
+     # figure out family role the respondent using the family roles of other members
+    respondentFamilyRole = 'unknown'
+    if not parentFound:
+       if respondent['gender'] == 'male':
+           respondentFamilyRole = 'father'
+           if wifeIndex >= 0:
+               family['members'][wifeIndex]['familyRole'] = 'mother'
+       elif respondent['gender'] == 'female':
+           respondentFamilyRole = 'mother'
+           if husbandIndex >= 0:
+               family['members'][husbandIndex]['familyRole'] = 'father'
+    else:
+        respondentFamilyRole = 'child' 
 
     # populate pregnancy status
     # get the names of the pregnant women of the family from the pregnancy mapping
@@ -289,17 +313,7 @@ def newFamily(beneficiary):
         if m['gender'] == 'male':
             m['pregnancy'] = 'no'
         elif 'pregnancy' not in m or m['pregnancy'] == '':
-            m['pregnancy'] = 'unknown'
-
-    # figure out family role the respondent using the family roles of other members
-    respondentFamilyRole = 'unknown'
-    if not parentFound:
-       if respondent['gender'] == 'male':
-           respondentFamilyRole = 'father'
-       elif respondent['gender'] == 'female':
-           respondentFamilyRole = 'mother'
-    else:
-        respondentFamilyRole = 'child'
+            m['pregnancy'] = 'unknown'   
 
     respondent['familyRole'] = respondentFamilyRole
 
@@ -398,6 +412,7 @@ def pushToDB(dbConnection, families):
             createFamilyMemberQuery = """INSERT INTO family_members (
                 id,
                 family_id,
+                name,
                 dob,
                 gender,
                 family_role,
@@ -420,6 +435,7 @@ def pushToDB(dbConnection, families):
             ) VALUES (
                 '%s',
                 '%s',
+                '%s',
                 %s,
                 '%s',
                 '%s',
@@ -439,11 +455,12 @@ def pushToDB(dbConnection, families):
                 %s,
                 '%s',
                 %s
-            )""" % (memberID, familyID, dob, m['gender'], m['familyRole'], disadvantaged, pregnancy, m['job'],
+            )""" % (memberID, familyID, m['name'], dob, GetNormalisedStringValue(m['gender']), m['familyRole'], disadvantaged, pregnancy, m['job'],
                     m['jobType'], inEducationalInstitute, m['educationLevel'], prevYearTenth,
                     prevYearTwelfth, tenthPercentageMarks, twelfthPercentageMarks, tenthTopTen,
                     twelfthTopTen, hasBOCWCard, bocwCardIssueDate, hasUOWCard, uowCardIssueDate)
             
+            print(m['name'])
             cursor.execute(createFamilyMemberQuery)
 
     # close the cursor
@@ -457,7 +474,7 @@ def main():
     
     for beneficiary in CSVLoader('maago/data/survey_data_may.csv'):
         beneficiaries.append(beneficiary)
-        break
+       
     print('%d beneficiaries' % len(beneficiaries))
 
     # get various mappings
