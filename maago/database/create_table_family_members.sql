@@ -5,6 +5,7 @@ CREATE TABLE family_members (
     gender ENUM('male', 'female', 'other'),
     family_role ENUM('grandparent', 'father', 'mother', 'child', 'in-law', 'other'),
     disadvantaged ENUM('true', 'false', 'unknown'),
+    pregnancy ENUM('true', 'false', 'unknown'),
     job VARCHAR(128),
     jobType VARCHAR(128),
     in_educational_institute ENUM('true', 'false', 'unknown'),

@@ -9,6 +9,7 @@ import sys
 import mysql.connector
 from mysql.connector import Error
 from common.util import GetAlphaNumericString, GetNormalisedValue, GetDBDateString, GetDBFloatString
+from thefuzz import fuzz
 
 class SimpleCSVLoader:
     # single header row
@@ -139,6 +140,7 @@ def getEntityForHeader(header):
             gender: string;
             familyRole: string;
             disadvantaged: bool;
+            pregnancy: bool;
             job: string;
             jobType: string;
             inEducationalInstitute: bool;
@@ -175,6 +177,7 @@ familyMapping = {}
 locationMapping = {}
 respondentMapping = {}
 familyMembersMapping = {}
+pregnancyMapping = {}
 # BAD CODE: FIX LATER
 # Following functions assume that the mappings above are already populated populated
 
@@ -199,21 +202,21 @@ def getMappedDict(headerMapping, srcDict):
 #     return value
 
 # fm##1$$job
-FAMILY_MEMBER_INDIVIDUAL_SEPARATOR = "##"
-FAMILY_MEMBER_ATTRIBUTE_SEPARATOR = "$$"
+INDIVIDUAL_SEPARATOR = "##"
+ATTRIBUTE_SEPARATOR = "$$"
 # We probably don't need this. TODO: Remove if necessary.
 # We are doing this so that no data is missed if any of he property is missing
 MAXIMUM_NUMBER_OF_FAMILY_MEMBERS = 6
 
-def splitFamilyMembersCombinedDict(familyMembersCombinedDict):
+def splitCombinedDict(combinedDict, numberOfMembers=MAXIMUM_NUMBER_OF_FAMILY_MEMBERS):
     otherFamilyMembers = []
 
-    for i in range(MAXIMUM_NUMBER_OF_FAMILY_MEMBERS):
+    for i in range(numberOfMembers):
         otherFamilyMembers.append({})
 
-    for key, value in familyMembersCombinedDict.items():
-        idPlusAttribute = key.split(FAMILY_MEMBER_INDIVIDUAL_SEPARATOR)[1]
-        idPlusAttribute = idPlusAttribute.split(FAMILY_MEMBER_ATTRIBUTE_SEPARATOR)
+    for key, value in combinedDict.items():
+        idPlusAttribute = key.split(INDIVIDUAL_SEPARATOR)[1]
+        idPlusAttribute = idPlusAttribute.split(ATTRIBUTE_SEPARATOR)
         id = int(idPlusAttribute[0]) - 1
         attribute = idPlusAttribute[1]        
         otherFamilyMembers[id][attribute] = value
@@ -236,7 +239,7 @@ def newFamily(beneficiary):
     familyMembersCombinedDict = getMappedDict(familyMembersMapping, beneficiary)
 
     # split the dict into various family members array
-    family['members'] = splitFamilyMembersCombinedDict(familyMembersCombinedDict)
+    family['members'] = splitCombinedDict(familyMembersCombinedDict)
 
     # Figure out family roles of the members based on relationship with the respondent
     parentFound = False
@@ -256,6 +259,30 @@ def newFamily(beneficiary):
             familyRole = 'in-law'
         
         member['familyRole'] = familyRole
+
+    # populate pregnancy status
+    # get the names of the pregnant women of the family from the pregnancy mapping
+    # use fuzzy string matching to figure out which of the family's members are pregnant
+    # update the pregnancy status of these family members
+    pregnantWomensCombinedDict = getMappedDict(pregnancyMapping, beneficiary)
+    pregnantWomen = splitCombinedDict(pregnantWomensCombinedDict)
+    familyMembersNames = []
+    for p in pregnantWomen:
+        fuzzyScore = -999
+        pIndex = -1
+        for i, m in enumerate(family['members'] + [respondent]):
+            memberName = m['name']
+            if memberName == '':
+                continue
+            # using simple ratio for now, will tweak later if needed
+            f = fuzz.ratio(p['name'], memberName) 
+            if f > fuzzyScore:
+                fuzzyScore = f
+                pIndex = i
+        if pIndex >= 0 and pIndex < (len(family['members']) - 1):
+            family['members'][pIndex]['pregnancy'] = 'yes'
+        elif pIndex == (len(family['members']) - 1):
+            respondent['pregnancy'] = 'yes'
 
     # figure out family role the respondent using the family roles of other members
     respondentFamilyRole = 'unknown'
@@ -428,10 +455,12 @@ def main():
     global locationMapping
     global respondentMapping
     global familyMembersMapping
+    global pregnancyMapping
     familyMapping = getMappingFromCSVLoaderResponse(CSVLoader('maago/config/familyMapping.csv'))
     locationMapping = getMappingFromCSVLoaderResponse(CSVLoader('maago/config/locationMapping.csv'))
     respondentMapping = getMappingFromCSVLoaderResponse(CSVLoader('maago/config/respondentMapping.csv'))
     familyMembersMapping = getMappingFromCSVLoaderResponse(CSVLoader('maago/config/familyMembersMapping.csv'))
+    pregnancyMapping = getMappingFromCSVLoaderResponse(CSVLoader('maago/config/pregnancyMapping.csv'))
    
     # For each beneficiary, create a structured (family) object out of it divided as family, respondent and family member data
     for beneficiary in beneficiaries:

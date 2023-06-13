@@ -1,0 +1,3 @@
+src,dest,dataType
+data.respondentDetailsContainer.namesOfPregnantWomen.1.namesOfPregnantWomenText.1,pw##1$$name,string
+data.respondentDetailsContainer.namesOfPregnantWomen.1.namesOfPregnantWomenText.2,pw##2$$name,string
