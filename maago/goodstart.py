@@ -8,7 +8,8 @@ import random
 import sys
 import mysql.connector
 from mysql.connector import Error
-from common.util import GetAlphaNumericString, GetNormalisedValue, GetDBDateString, GetDBFloatString
+from common.util import GetAlphaNumericString, GetNormalisedValue, GetDBDateString, GetDBFloatString, GetNormalisedStringValue
+from thefuzz import fuzz
 
 class SimpleCSVLoader:
     # single header row
@@ -63,29 +64,34 @@ Scheme = 'Scheme'
 SubScheme = 'Sub-Scheme'
 IDiSchemeSubDiv = 'IDi scheme sub-divisions'
 
+# def LoadSchemes():
+#     schemes = []
+#     n = 0
+#     for scheme in CSVLoader('maago/config/benefitsCG.csv', numHeader=2):
+#         n += 1
+#         if (scheme[State] == 'Chhattisgarh'
+#           and scheme[Sector] == 'Right to Livelihood'
+#           and scheme[Scheme] == 'BoCW'
+#           and (scheme[SubScheme] == 'Noni Sashaktikaran Scheme'
+#                or scheme[SubScheme] == 'Mini Mata Mahtari Jatan Yojna'
+#                or scheme[SubScheme] == 'Chief Minister Shramik Tool Assistance Scheme'
+#                or scheme[SubScheme] == 'Naunihal Scholarship Scheme'
+#                or (scheme[SubScheme] == 'Meritorious Student / Student Education Promotion Scheme'
+#                     and scheme[IDiSchemeSubDiv] == 'B')
+#                or (scheme[SubScheme] == 'Construction Workers Permanent Disability and Accidental Death Pension Scheme'
+#                     and scheme[IDiSchemeSubDiv] == 'B'))):
+#               schemes.append(scheme)
+#         elif (scheme[State] == 'Chhattisgarh'
+#           and scheme[Sector] == 'Right to Livelihood'
+#           and scheme[Scheme] == 'UoW'
+#           and scheme[SubScheme] == 'Chief Minister Unorganized Workers Cycle Assistance Scheme'):
+#               schemes.append(scheme)
+#     print('considering %d schemas out of %d' % (len(schemes), n))
+#     return schemes
+
 def LoadSchemes():
-    schemes = []
-    n = 0
-    for scheme in CSVLoader('maago/config/benefitsCG.csv', numHeader=2):
-        n += 1
-        if (scheme[State] == 'Chhattisgarh'
-          and scheme[Sector] == 'Right to Livelihood'
-          and scheme[Scheme] == 'BoCW'
-          and (scheme[SubScheme] == 'Noni Sashaktikaran Scheme'
-               or scheme[SubScheme] == 'Mini Mata Mahtari Jatan Yojna'
-               or scheme[SubScheme] == 'Chief Minister Shramik Tool Assistance Scheme'
-               or scheme[SubScheme] == 'Naunihal Scholarship Scheme'
-               or (scheme[SubScheme] == 'Meritorious Student / Student Education Promotion Scheme'
-                    and scheme[IDiSchemeSubDiv] == 'B')
-               or (scheme[SubScheme] == 'Construction Workers Permanent Disability and Accidental Death Pension Scheme'
-                    and scheme[IDiSchemeSubDiv] == 'B'))):
-              schemes.append(scheme)
-        elif (scheme[State] == 'Chhattisgarh'
-          and scheme[Sector] == 'Right to Livelihood'
-          and scheme[Scheme] == 'UoW'
-          and scheme[SubScheme] == 'Chief Minister Unorganized Workers Cycle Assistance Scheme'):
-              schemes.append(scheme)
-    print('considering %d schemas out of %d' % (len(schemes), n))
+    schemes = CSVLoader('maago/config/schemes.csv')
+
     return schemes
 
 def SchemeName(scheme):
@@ -139,6 +145,7 @@ def getEntityForHeader(header):
             gender: string;
             familyRole: string;
             disadvantaged: bool;
+            pregnancy: bool;
             job: string;
             jobType: string;
             inEducationalInstitute: bool;
@@ -175,6 +182,7 @@ familyMapping = {}
 locationMapping = {}
 respondentMapping = {}
 familyMembersMapping = {}
+pregnancyMapping = {}
 # BAD CODE: FIX LATER
 # Following functions assume that the mappings above are already populated populated
 
@@ -199,21 +207,21 @@ def getMappedDict(headerMapping, srcDict):
 #     return value
 
 # fm##1$$job
-FAMILY_MEMBER_INDIVIDUAL_SEPARATOR = "##"
-FAMILY_MEMBER_ATTRIBUTE_SEPARATOR = "$$"
+INDIVIDUAL_SEPARATOR = "##"
+ATTRIBUTE_SEPARATOR = "$$"
 # We probably don't need this. TODO: Remove if necessary.
 # We are doing this so that no data is missed if any of he property is missing
 MAXIMUM_NUMBER_OF_FAMILY_MEMBERS = 6
 
-def splitFamilyMembersCombinedDict(familyMembersCombinedDict):
+def splitCombinedDict(combinedDict, numberOfMembers=MAXIMUM_NUMBER_OF_FAMILY_MEMBERS):
     otherFamilyMembers = []
 
-    for i in range(MAXIMUM_NUMBER_OF_FAMILY_MEMBERS):
+    for i in range(numberOfMembers):
         otherFamilyMembers.append({})
 
-    for key, value in familyMembersCombinedDict.items():
-        idPlusAttribute = key.split(FAMILY_MEMBER_INDIVIDUAL_SEPARATOR)[1]
-        idPlusAttribute = idPlusAttribute.split(FAMILY_MEMBER_ATTRIBUTE_SEPARATOR)
+    for key, value in combinedDict.items():
+        idPlusAttribute = key.split(INDIVIDUAL_SEPARATOR)[1]
+        idPlusAttribute = idPlusAttribute.split(ATTRIBUTE_SEPARATOR)
         id = int(idPlusAttribute[0]) - 1
         attribute = idPlusAttribute[1]        
         otherFamilyMembers[id][attribute] = value
@@ -236,11 +244,16 @@ def newFamily(beneficiary):
     familyMembersCombinedDict = getMappedDict(familyMembersMapping, beneficiary)
 
     # split the dict into various family members array
-    family['members'] = splitFamilyMembersCombinedDict(familyMembersCombinedDict)
+    family['members'] = splitCombinedDict(familyMembersCombinedDict)
 
     # Figure out family roles of the members based on relationship with the respondent
     parentFound = False
-    for member in family['members']:
+
+    # it may happen that the respondent is a parent, in which case we need to keep track
+    # of the husband or wife and use it later to assign proper role
+    wifeIndex = -1
+    husbandIndex = -1
+    for i, member in enumerate(family['members']):
         familyRole = 'unknown'
         relationshipWithRespondent = member['relationshipWithRespondent']        
 
@@ -250,22 +263,67 @@ def newFamily(beneficiary):
         elif relationshipWithRespondent == 'mother':
             familyRole = 'mother'
             parentFound = True
-        elif relationshipWithRespondent in ['brother', 'sister', 'sibling']:
+        elif relationshipWithRespondent in ['child', 'brother', 'sister', 'sibling']:
             familyRole = 'child'
-        elif "in-law" in relationshipWithRespondent:
+        elif "inlaw" in relationshipWithRespondent.replace("-", "").lower():
             familyRole = 'in-law'
-        
+        elif relationshipWithRespondent == 'husband':
+            husbandIndex = i
+        elif relationshipWithRespondent == 'wife':
+            wifeIndex = i
+        elif relationshipWithRespondent in ['', 'other']:
+            familyRole = 'other'
         member['familyRole'] = familyRole
 
-    # figure out family role the respondent using the family roles of other members
+     # figure out family role the respondent using the family roles of other members
     respondentFamilyRole = 'unknown'
     if not parentFound:
        if respondent['gender'] == 'male':
            respondentFamilyRole = 'father'
+           if wifeIndex >= 0:
+               family['members'][wifeIndex]['familyRole'] = 'mother'
        elif respondent['gender'] == 'female':
            respondentFamilyRole = 'mother'
+           if husbandIndex >= 0:
+               family['members'][husbandIndex]['familyRole'] = 'father'
     else:
-        respondentFamilyRole = 'child'
+        respondentFamilyRole = 'child' 
+
+    # populate pregnancy status
+    # get the names of the pregnant women of the family from the pregnancy mapping
+    # use fuzzy string matching to figure out which of the family's members are pregnant
+    # update the pregnancy status of these family members
+    pregnantWomensCombinedDict = getMappedDict(pregnancyMapping, beneficiary)
+    # current data has a provision of only two pregnant women, so pass two
+    pregnantWomen = splitCombinedDict(pregnantWomensCombinedDict, 2)
+    familyMembersNames = []
+    for p in pregnantWomen:
+        fuzzyScore = -999
+        pIndex = -1
+        pName = p['name'].strip()
+        if pName == '':
+            continue
+        else:
+            breakpoint()
+        for i, m in enumerate(family['members'] + [respondent]):
+            memberName = m['name']
+            if memberName == '':
+                continue
+            # using simple ratio for now, will tweak later if needed
+            f = fuzz.ratio(pName, memberName) 
+            if f > fuzzyScore:
+                fuzzyScore = f
+                pIndex = i
+        if pIndex >= 0 and pIndex < (len(family['members']) - 1):            
+            family['members'][pIndex]['pregnancy'] = 'yes'
+        elif pIndex == (len(family['members']) - 1):
+            respondent['pregnancy'] = 'yes'
+
+    for m in (family['members'] + [respondent]):
+        if m['gender'] == 'male':
+            m['pregnancy'] = 'no'
+        elif 'pregnancy' not in m or m['pregnancy'] == '':
+            m['pregnancy'] = 'unknown'   
 
     respondent['familyRole'] = respondentFamilyRole
 
@@ -348,6 +406,7 @@ def pushToDB(dbConnection, families):
             twelfthTopTen = GetNormalisedValue(m['twelfthTopTen'])
             hasBOCWCard = GetNormalisedValue(m['hasBOCWCard'])
             hasUOWCard = GetNormalisedValue(m['hasUOWCard'])
+            pregnancy = GetNormalisedValue(m['pregnancy'])
 
             # calculate date columns
             # dob, bocwCardIssueDate, uowCardIssueDate
@@ -363,10 +422,12 @@ def pushToDB(dbConnection, families):
             createFamilyMemberQuery = """INSERT INTO family_members (
                 id,
                 family_id,
+                name,
                 dob,
                 gender,
                 family_role,
                 disadvantaged,
+                pregnancy,
                 job,
                 jobType,
                 in_educational_institute,
@@ -384,7 +445,9 @@ def pushToDB(dbConnection, families):
             ) VALUES (
                 '%s',
                 '%s',
+                '%s',
                 %s,
+                '%s',
                 '%s',
                 '%s',
                 '%s',
@@ -402,7 +465,7 @@ def pushToDB(dbConnection, families):
                 %s,
                 '%s',
                 %s
-            )""" % (memberID, familyID, dob, m['gender'], m['familyRole'], disadvantaged, m['job'],
+            )""" % (memberID, familyID, m['name'], dob, GetNormalisedStringValue(m['gender']), m['familyRole'], disadvantaged, pregnancy, m['job'],
                     m['jobType'], inEducationalInstitute, m['educationLevel'], prevYearTenth,
                     prevYearTwelfth, tenthPercentageMarks, twelfthPercentageMarks, tenthTopTen,
                     twelfthTopTen, hasBOCWCard, bocwCardIssueDate, hasUOWCard, uowCardIssueDate)
@@ -420,7 +483,7 @@ def main():
     
     for beneficiary in CSVLoader('maago/data/survey_data_may.csv'):
         beneficiaries.append(beneficiary)
-        break
+       
     print('%d beneficiaries' % len(beneficiaries))
 
     # get various mappings
@@ -428,10 +491,12 @@ def main():
     global locationMapping
     global respondentMapping
     global familyMembersMapping
+    global pregnancyMapping
     familyMapping = getMappingFromCSVLoaderResponse(CSVLoader('maago/config/familyMapping.csv'))
     locationMapping = getMappingFromCSVLoaderResponse(CSVLoader('maago/config/locationMapping.csv'))
     respondentMapping = getMappingFromCSVLoaderResponse(CSVLoader('maago/config/respondentMapping.csv'))
     familyMembersMapping = getMappingFromCSVLoaderResponse(CSVLoader('maago/config/familyMembersMapping.csv'))
+    pregnancyMapping = getMappingFromCSVLoaderResponse(CSVLoader('maago/config/pregnancyMapping.csv'))
    
     # For each beneficiary, create a structured (family) object out of it divided as family, respondent and family member data
     for beneficiary in beneficiaries:
@@ -455,15 +520,31 @@ def main():
     # Push data in mysql db
     pushToDB(dbConnection, families)
 
-    scheme = random.choice(schemes)
-    beneficiary = random.choice(beneficiaries)
-    #match(beneficiary, scheme)
-
     # commit db transactions
     dbConnection.commit()
 
+    cursor = dbConnection.cursor()
+    scheme_beneficiaries = {}
+    # get all the eligible members for each family using the inclusion criteria for the scheme
+    for s in schemes:
+        inclusionCriteria = s['inclusion_criteria']
+        # TODO: Add exclusion criteria
+        eligibilityQuery = """SELECT f.id as family_id, fm.id as member_id from families as f INNER JOIN 
+        family_members as fm ON f.id = fm.family_id WHERE %s""" % inclusionCriteria
+
+        print(eligibilityQuery)
+
+        cursor.execute(eligibilityQuery)        
+        result = cursor.fetchall()
+        print(result)
+
+    cursor.close()
     dbConnection.close()
 
+    # scheme = random.choice(schemes)
+    # beneficiary = random.choice(beneficiaries)
+    # result = match(beneficiary, scheme)
+    # print(result)
     return 0
 
 if __name__ == '__main__':
