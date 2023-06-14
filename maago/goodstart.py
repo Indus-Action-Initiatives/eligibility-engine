@@ -64,29 +64,34 @@ Scheme = 'Scheme'
 SubScheme = 'Sub-Scheme'
 IDiSchemeSubDiv = 'IDi scheme sub-divisions'
 
+# def LoadSchemes():
+#     schemes = []
+#     n = 0
+#     for scheme in CSVLoader('maago/config/benefitsCG.csv', numHeader=2):
+#         n += 1
+#         if (scheme[State] == 'Chhattisgarh'
+#           and scheme[Sector] == 'Right to Livelihood'
+#           and scheme[Scheme] == 'BoCW'
+#           and (scheme[SubScheme] == 'Noni Sashaktikaran Scheme'
+#                or scheme[SubScheme] == 'Mini Mata Mahtari Jatan Yojna'
+#                or scheme[SubScheme] == 'Chief Minister Shramik Tool Assistance Scheme'
+#                or scheme[SubScheme] == 'Naunihal Scholarship Scheme'
+#                or (scheme[SubScheme] == 'Meritorious Student / Student Education Promotion Scheme'
+#                     and scheme[IDiSchemeSubDiv] == 'B')
+#                or (scheme[SubScheme] == 'Construction Workers Permanent Disability and Accidental Death Pension Scheme'
+#                     and scheme[IDiSchemeSubDiv] == 'B'))):
+#               schemes.append(scheme)
+#         elif (scheme[State] == 'Chhattisgarh'
+#           and scheme[Sector] == 'Right to Livelihood'
+#           and scheme[Scheme] == 'UoW'
+#           and scheme[SubScheme] == 'Chief Minister Unorganized Workers Cycle Assistance Scheme'):
+#               schemes.append(scheme)
+#     print('considering %d schemas out of %d' % (len(schemes), n))
+#     return schemes
+
 def LoadSchemes():
-    schemes = []
-    n = 0
-    for scheme in CSVLoader('maago/config/benefitsCG.csv', numHeader=2):
-        n += 1
-        if (scheme[State] == 'Chhattisgarh'
-          and scheme[Sector] == 'Right to Livelihood'
-          and scheme[Scheme] == 'BoCW'
-          and (scheme[SubScheme] == 'Noni Sashaktikaran Scheme'
-               or scheme[SubScheme] == 'Mini Mata Mahtari Jatan Yojna'
-               or scheme[SubScheme] == 'Chief Minister Shramik Tool Assistance Scheme'
-               or scheme[SubScheme] == 'Naunihal Scholarship Scheme'
-               or (scheme[SubScheme] == 'Meritorious Student / Student Education Promotion Scheme'
-                    and scheme[IDiSchemeSubDiv] == 'B')
-               or (scheme[SubScheme] == 'Construction Workers Permanent Disability and Accidental Death Pension Scheme'
-                    and scheme[IDiSchemeSubDiv] == 'B'))):
-              schemes.append(scheme)
-        elif (scheme[State] == 'Chhattisgarh'
-          and scheme[Sector] == 'Right to Livelihood'
-          and scheme[Scheme] == 'UoW'
-          and scheme[SubScheme] == 'Chief Minister Unorganized Workers Cycle Assistance Scheme'):
-              schemes.append(scheme)
-    print('considering %d schemas out of %d' % (len(schemes), n))
+    schemes = CSVLoader('maago/config/schemes.csv')
+
     return schemes
 
 def SchemeName(scheme):
@@ -295,16 +300,21 @@ def newFamily(beneficiary):
     for p in pregnantWomen:
         fuzzyScore = -999
         pIndex = -1
+        pName = p['name'].strip()
+        if pName == '':
+            continue
+        else:
+            breakpoint()
         for i, m in enumerate(family['members'] + [respondent]):
             memberName = m['name']
             if memberName == '':
                 continue
             # using simple ratio for now, will tweak later if needed
-            f = fuzz.ratio(p['name'], memberName) 
+            f = fuzz.ratio(pName, memberName) 
             if f > fuzzyScore:
                 fuzzyScore = f
                 pIndex = i
-        if pIndex >= 0 and pIndex < (len(family['members']) - 1):
+        if pIndex >= 0 and pIndex < (len(family['members']) - 1):            
             family['members'][pIndex]['pregnancy'] = 'yes'
         elif pIndex == (len(family['members']) - 1):
             respondent['pregnancy'] = 'yes'
@@ -460,7 +470,6 @@ def pushToDB(dbConnection, families):
                     prevYearTwelfth, tenthPercentageMarks, twelfthPercentageMarks, tenthTopTen,
                     twelfthTopTen, hasBOCWCard, bocwCardIssueDate, hasUOWCard, uowCardIssueDate)
             
-            print(m['name'])
             cursor.execute(createFamilyMemberQuery)
 
     # close the cursor
@@ -511,15 +520,31 @@ def main():
     # Push data in mysql db
     pushToDB(dbConnection, families)
 
-    scheme = random.choice(schemes)
-    beneficiary = random.choice(beneficiaries)
-    #match(beneficiary, scheme)
-
     # commit db transactions
     dbConnection.commit()
 
+    cursor = dbConnection.cursor()
+    scheme_beneficiaries = {}
+    # get all the eligible members for each family using the inclusion criteria for the scheme
+    for s in schemes:
+        inclusionCriteria = s['inclusion_criteria']
+        # TODO: Add exclusion criteria
+        eligibilityQuery = """SELECT f.id as family_id, fm.id as member_id from families as f INNER JOIN 
+        family_members as fm ON f.id = fm.family_id WHERE %s""" % inclusionCriteria
+
+        print(eligibilityQuery)
+
+        cursor.execute(eligibilityQuery)        
+        result = cursor.fetchall()
+        print(result)
+
+    cursor.close()
     dbConnection.close()
 
+    # scheme = random.choice(schemes)
+    # beneficiary = random.choice(beneficiaries)
+    # result = match(beneficiary, scheme)
+    # print(result)
     return 0
 
 if __name__ == '__main__':
