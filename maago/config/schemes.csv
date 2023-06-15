@@ -1,2 +1,2 @@
 name,state,right,department,description,inclusion_criteria,exclusion_criteria
-Mini Mata Mahtari Jatan Yojna,Chattisgarh,Right to Livelihood,BoCW,"Female construction worker gets INR 20,000 during pregnancy","fm.gender IN ('female', 'other') AND fm.pregnancy='true' AND fm.has_bocw_card IN ('true', 'unknown') AND DATEDIFF(CURDATE(), fm.bocw_card_issue_date) > 90",1=0
+Mini Mata Mahtari Jatan Yojna,Chattisgarh,Right to Livelihood,BoCW,"Female construction worker gets INR 20,000 during pregnancy","(fm.gender IN ('female', 'other')) AND (fm.pregnancy='true') AND (fm.has_bocw_card='true') AND (DATEDIFF(CURDATE(), fm.bocw_card_issue_date) > 90)",1=0

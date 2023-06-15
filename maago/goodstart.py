@@ -4,12 +4,12 @@
 # angshuman.guha@gmail.com
 
 import csv
-import random
 import sys
 import mysql.connector
 from mysql.connector import Error
 from common.util import GetAlphaNumericString, GetNormalisedValue, GetDBDateString, GetDBFloatString, GetNormalisedStringValue
 from thefuzz import fuzz
+import re
 
 class SimpleCSVLoader:
     # single header row
@@ -303,8 +303,7 @@ def newFamily(beneficiary):
         pName = p['name'].strip()
         if pName == '':
             continue
-        else:
-            breakpoint()
+      
         for i, m in enumerate(family['members'] + [respondent]):
             memberName = m['name']
             if memberName == '':
@@ -474,6 +473,42 @@ def pushToDB(dbConnection, families):
 
     # close the cursor
     cursor.close()
+
+# Assumptions:
+# 1. Each criterion is enclosed in a pair of parenthesis
+# 2. In case of nested parenthesis, the inner parenthesis will be ignored
+# 3. Criteria are connected with only AND, ORs are not allowed as connectors
+# 4. ORs are always inside the token, i.e. within the parenthesis
+def getCriteriaTokensFromInclusionCriteria(criteria):
+    tokens = []
+
+    openingParentheses = closingParentheses = 0    
+    currentToken = ''
+    for char in criteria:
+        if char == '(':
+            openingParentheses += 1
+        if char == ')':
+            closingParentheses += 1
+
+        if openingParentheses > 0:
+            currentToken += char
+
+        # ignore the expression connectors, assuming it's always an AND
+        if openingParentheses == closingParentheses and openingParentheses > 0:            
+            tokens.append(currentToken)
+            currentToken = ''
+            openingParentheses = closingParentheses = 0
+    
+    return tokens
+
+def getColumnsFromCriterion(criterion):
+    return re.findall('fm\.\w+|f\.\w+', criterion)
+    
+# UNKNOWN_SCORE = 0.001
+# UNKNOWN_STRING = 'maago__unknown'
+# UNKNOWN_NUMBER = '-111111'
+# UNKNOWN_DATE = '01-01-1800'
+# def getCriterionStringFromCriteriaToken(ct):
     
 
 def main():
@@ -528,9 +563,32 @@ def main():
     # get all the eligible members for each family using the inclusion criteria for the scheme
     for s in schemes:
         inclusionCriteria = s['inclusion_criteria']
+        criteria = getCriteriaTokensFromInclusionCriteria(inclusionCriteria)
         # TODO: Add exclusion criteria
-        eligibilityQuery = """SELECT f.id as family_id, fm.id as member_id from families as f INNER JOIN 
-        family_members as fm ON f.id = fm.family_id WHERE %s""" % inclusionCriteria
+
+        # get column from the criteria
+        criteriaColumns = {}
+        for i, c in enumerate(criteria):
+            criteriaColumns['criteria%d' % i] = getColumnsFromCriterion(c)
+        columns = set()
+        for values in criteriaColumns.values():
+            for v in values:
+                columns.add(v)
+
+        # generate criteria string
+        # criteria = [getCriterionStringFromCriteriaToken(c) for c in criteria]
+        # criteriaString = ', '.join(criteria)
+        # generate the select clause 
+
+        criteriaStrings = []
+        for i, c in enumerate(criteria):
+            criteriaStrings.append('CASE WHEN %s THEN 1 ELSE 0 END AS criteria%d' % (c, i))
+        mainCriteriaString = '(CASE WHEN %s THEN 1 ELSE 0 END) as main_criteria' % inclusionCriteria
+        fromClause = ' FROM families as f INNER JOIN family_members as fm ON f.id = fm.family_id'
+        eligibilityQuery = 'SELECT ' + ', '.join(columns) + ', ' + ', '.join(criteriaStrings)         + ', ' + mainCriteriaString + ', f.id as family_id, fm.id as member_id' + fromClause
+
+        # eligibilityQuery = """SELECT f.id as family_id, fm.id as member_id, %s from families as f INNER JOIN 
+        # family_members as fm ON f.id = fm.family_id WHERE %s""" % criteriaString
 
         print(eligibilityQuery)
 
