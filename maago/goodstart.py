@@ -10,6 +10,7 @@ from mysql.connector import Error
 from common.util import GetAlphaNumericString, GetNormalisedValue, GetDBDateString, GetDBFloatString, GetNormalisedStringValue
 from thefuzz import fuzz
 import re
+import datetime
 
 class SimpleCSVLoader:
     # single header row
@@ -254,7 +255,7 @@ def newFamily(beneficiary):
     wifeIndex = -1
     husbandIndex = -1
     for i, member in enumerate(family['members']):
-        familyRole = 'unknown'
+        familyRole = UNKNOWN_STRING
         relationshipWithRespondent = member['relationshipWithRespondent']        
 
         if relationshipWithRespondent == 'father':
@@ -276,7 +277,7 @@ def newFamily(beneficiary):
         member['familyRole'] = familyRole
 
      # figure out family role the respondent using the family roles of other members
-    respondentFamilyRole = 'unknown'
+    respondentFamilyRole = UNKNOWN_STRING
     if not parentFound:
        if respondent['gender'] == 'male':
            respondentFamilyRole = 'father'
@@ -322,17 +323,17 @@ def newFamily(beneficiary):
         if m['gender'] == 'male':
             m['pregnancy'] = 'no'
         elif 'pregnancy' not in m or m['pregnancy'] == '':
-            m['pregnancy'] = 'unknown'   
+            m['pregnancy'] = UNKNOWN_STRING   
 
     respondent['familyRole'] = respondentFamilyRole
 
     # no data regarding some of the respondent's field. use unknown
-    respondent['disadvantaged'] = 'unknown'
-    respondent['prevYearTenth'] = 'unknown'
-    respondent['prevYearTwelfth'] = 'unknown'
-    respondent['tenthTopTen'] = 'unknown'
-    respondent['twelfthTopTen'] = 'unknown'
-    respondent['jobType'] = 'unknown'
+    respondent['disadvantaged'] = UNKNOWN_STRING
+    respondent['prevYearTenth'] = UNKNOWN_STRING
+    respondent['prevYearTwelfth'] = UNKNOWN_STRING
+    respondent['tenthTopTen'] = UNKNOWN_STRING
+    respondent['twelfthTopTen'] = UNKNOWN_STRING
+    respondent['jobType'] = UNKNOWN_STRING
     respondent['tenthPercentageMarks'] = GetDBFloatString('-1')
     respondent['twelfthPercentageMarks'] = GetDBFloatString('-1')
 
@@ -503,13 +504,63 @@ def getCriteriaTokensFromInclusionCriteria(criteria):
 
 def getColumnsFromCriterion(criterion):
     return re.findall('fm\.\w+|f\.\w+', criterion)
+
+def getOrderedColumnNamesFromTheSelectClause(fromClause):
+    return re.findall(' as (\w+)', fromClause)
     
-# UNKNOWN_SCORE = 0.001
-# UNKNOWN_STRING = 'maago__unknown'
-# UNKNOWN_NUMBER = '-111111'
-# UNKNOWN_DATE = '01-01-1800'
-# def getCriterionStringFromCriteriaToken(ct):
-    
+UNKNOWN_SCORE = 0.001
+UNKNOWN_STRING = 'unknown'
+UNKNOWN_NUMBER = -111111
+UNKNOWN_DATE = datetime.strptime('01-01-1800', '%d-%m-%Y')
+PROXIMITY_SCORE_KEY = 'proximity_score'
+
+def calculateProximityScore(rowValues, criteriaColumns):
+    unknowns = [UNKNOWN_STRING, UNKNOWN_NUMBER, UNKNOWN_DATE]
+    proximityScore = 0
+    totalScore = 0
+    criteriaKeys = filter(lambda k: 'criteria' in k, rowValues.keys())
+    for k in criteriaKeys:
+        if k == 'main_criteria':
+            continue
+        if rowValues[k] == 1:
+            totalScore += 1
+        else:
+            # check for unknown values and factor those in
+            # right now only A is supported, (A AND B) is not
+            # stupid!            
+            kColumns = criteriaColumns[k]
+            for c in kColumns:
+                if rowValues[c] in unknowns:
+                    totalScore += UNKNOWN_SCORE
+                    # this breaks my heart as well
+                    break
+    proximityScore = totalScore/(len(criteriaKeys) -1)
+
+    return proximityScore
+
+def populateProximityScores(schemeBeneficiaries, rows, orderedColumnNames, criteriaColumns):
+    nameIndices = {}
+    for row in rows:
+        rowValues = {}
+        for i, c in enumerate(orderedColumnNames):
+            rowValues[c] = row[i]
+        beneficiaryKey = '%s__%s' % (rowValues['f.id'], rowValues['fm.id'])
+        schemeName = rowValues['scheme_name']
+        beneficiary = {}
+        if beneficiaryKey not in schemeBeneficiaries:
+            beneficiary = {}
+        for i, c in enumerate(orderedColumnNames):
+            if 'criteria' not in c:
+                beneficiary[c] = row[i]
+            else:
+                beneficiary['%s__%s' % (schemeName, c)] = row[i]
+        if row[nameIndices['main_criteria']] == 1:
+            beneficiary['%s__%s' % (schemeName, PROXIMITY_SCORE_KEY)] = 1
+        else:
+            beneficiary['%s__%s' % (schemeName, PROXIMITY_SCORE_KEY)] = calculateProximityScore(rowValues, criteriaColumns)
+        schemeBeneficiaries[beneficiaryKey] = beneficiary
+        
+    return
 
 def main():
     schemes = LoadSchemes()
@@ -582,19 +633,22 @@ def main():
 
         criteriaStrings = []
         for i, c in enumerate(criteria):
-            criteriaStrings.append('CASE WHEN %s THEN 1 ELSE 0 END AS criteria%d' % (c, i))
+            criteriaStrings.append('CASE WHEN %s THEN 1 ELSE 0 END as criteria%d' % (c, i))
         mainCriteriaString = '(CASE WHEN %s THEN 1 ELSE 0 END) as main_criteria' % inclusionCriteria
-        fromClause = ' FROM families as f INNER JOIN family_members as fm ON f.id = fm.family_id'
-        eligibilityQuery = 'SELECT ' + ', '.join(columns) + ', ' + ', '.join(criteriaStrings)         + ', ' + mainCriteriaString + ', f.id as family_id, fm.id as member_id' + fromClause
+        fromClause = 'FROM families as f INNER JOIN family_members as fm ON f.id = fm.family_id'
+        selectClause = 'SELECT f.id, fm.id, %s as scheme_name' % s['name'] + ', '.join(columns) + ', ' + ', '.join(criteriaStrings) + ', ' + mainCriteriaString
+        eligibilityQuery = selectClause + ' ' + fromClause
 
-        # eligibilityQuery = """SELECT f.id as family_id, fm.id as member_id, %s from families as f INNER JOIN 
-        # family_members as fm ON f.id = fm.family_id WHERE %s""" % criteriaString
-
-        print(eligibilityQuery)
+        # get values for each part of the select clause
+        orderedColumnNames = getOrderedColumnNamesFromTheSelectClause(selectClause)        
 
         cursor.execute(eligibilityQuery)        
-        result = cursor.fetchall()
-        print(result)
+        rows = cursor.fetchall()
+        
+        # populate respective fields for each beneficiary and calculate the proximity scores for each one of them
+        populateProximityScores(scheme_beneficiaries, rows, orderedColumnNames, criteriaColumns)
+    
+    print(scheme_beneficiaries)
 
     cursor.close()
     dbConnection.close()
