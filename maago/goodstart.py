@@ -10,7 +10,7 @@ from mysql.connector import Error
 from common.util import GetAlphaNumericString, GetNormalisedValue, GetDBDateString, GetDBFloatString, GetNormalisedStringValue
 from thefuzz import fuzz
 import re
-import datetime
+from datetime import datetime
 
 class SimpleCSVLoader:
     # single header row
@@ -506,7 +506,7 @@ def getColumnsFromCriterion(criterion):
     return re.findall('fm\.\w+|f\.\w+', criterion)
 
 def getOrderedColumnNamesFromTheSelectClause(fromClause):
-    return re.findall(' as (\w+)', fromClause)
+    return re.findall(' as \'?([\\w.]+)\'?', fromClause)
     
 UNKNOWN_SCORE = 0.001
 UNKNOWN_STRING = 'unknown'
@@ -515,10 +515,10 @@ UNKNOWN_DATE = datetime.strptime('01-01-1800', '%d-%m-%Y')
 PROXIMITY_SCORE_KEY = 'proximity_score'
 
 def calculateProximityScore(rowValues, criteriaColumns):
-    unknowns = [UNKNOWN_STRING, UNKNOWN_NUMBER, UNKNOWN_DATE]
+    unknowns = [UNKNOWN_STRING, UNKNOWN_NUMBER, UNKNOWN_DATE, None]
     proximityScore = 0
     totalScore = 0
-    criteriaKeys = filter(lambda k: 'criteria' in k, rowValues.keys())
+    criteriaKeys = list(filter(lambda k: 'criteria' in k, rowValues.keys()))
     for k in criteriaKeys:
         if k == 'main_criteria':
             continue
@@ -527,19 +527,28 @@ def calculateProximityScore(rowValues, criteriaColumns):
         else:
             # check for unknown values and factor those in
             # right now only A is supported, (A AND B) is not
-            # stupid!            
+            # stupid! 
+            # 
+            # we do not support any ORs right now, so just bailing out whenever
+            # any known failing criteria is found
             kColumns = criteriaColumns[k]
+            guarenteedFailingCriteriaFound = False
             for c in kColumns:
                 if rowValues[c] in unknowns:
                     totalScore += UNKNOWN_SCORE
                     # this breaks my heart as well
                     break
+                else:
+                    guarenteedFailingCriteriaFound = True
+                    break
+            if guarenteedFailingCriteriaFound:
+                totalScore = 0
+                break
     proximityScore = totalScore/(len(criteriaKeys) -1)
 
     return proximityScore
 
 def populateProximityScores(schemeBeneficiaries, rows, orderedColumnNames, criteriaColumns):
-    nameIndices = {}
     for row in rows:
         rowValues = {}
         for i, c in enumerate(orderedColumnNames):
@@ -553,8 +562,9 @@ def populateProximityScores(schemeBeneficiaries, rows, orderedColumnNames, crite
             if 'criteria' not in c:
                 beneficiary[c] = row[i]
             else:
+                # TODO: Add description of the criteria as well.
                 beneficiary['%s__%s' % (schemeName, c)] = row[i]
-        if row[nameIndices['main_criteria']] == 1:
+        if rowValues['main_criteria'] == 1:
             beneficiary['%s__%s' % (schemeName, PROXIMITY_SCORE_KEY)] = 1
         else:
             beneficiary['%s__%s' % (schemeName, PROXIMITY_SCORE_KEY)] = calculateProximityScore(rowValues, criteriaColumns)
@@ -636,7 +646,7 @@ def main():
             criteriaStrings.append('CASE WHEN %s THEN 1 ELSE 0 END as criteria%d' % (c, i))
         mainCriteriaString = '(CASE WHEN %s THEN 1 ELSE 0 END) as main_criteria' % inclusionCriteria
         fromClause = 'FROM families as f INNER JOIN family_members as fm ON f.id = fm.family_id'
-        selectClause = 'SELECT f.id, fm.id, %s as scheme_name' % s['name'] + ', '.join(columns) + ', ' + ', '.join(criteriaStrings) + ', ' + mainCriteriaString
+        selectClause = 'SELECT \'%s\' as scheme_name, f.id as \'f.id\', fm.id as \'fm.id\', ' % s['name'] + ', '.join(['%s as \'%s\'' % (c,c) for c in columns]) + ', ' + ', '.join(criteriaStrings) + ', ' + mainCriteriaString
         eligibilityQuery = selectClause + ' ' + fromClause
 
         # get values for each part of the select clause
