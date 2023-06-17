@@ -572,12 +572,28 @@ def populateProximityScores(schemeBeneficiaries, rows, orderedColumnNames, crite
         
     return
 
-def main():
-    schemes = LoadSchemes()
+def GetDBConnection():
+    # TODO: Make singleton?
+    dbConnection = mysql.connector.connect(
+        host='localhost',
+        user='maago',
+        passwd='maagoindus',
+        db='ee'
+    )
+    try:
+        if dbConnection.is_connected():
+            print("connected to the mysql db")           
+    except Error as e:
+        print("error: ", e)
+        return None
+
+    return dbConnection
+
+def LoadBeneficiaries(dataFileName):
     beneficiaries = []
     families = []
     
-    for beneficiary in CSVLoader('maago/data/survey_data_may.csv'):
+    for beneficiary in CSVLoader(dataFileName):
         beneficiaries.append(beneficiary)
        
     print('%d beneficiaries' % len(beneficiaries))
@@ -600,18 +616,7 @@ def main():
         family = newFamily(beneficiary);
         families.append(family)
 
-    # TODO: get connection on demand
-    dbConnection = mysql.connector.connect(
-        host='localhost',
-        user='maago',
-        passwd='maagoindus',
-        db='ee'
-    )
-    try:
-        if dbConnection.is_connected():
-            print("connected to the mysql db")           
-    except Error as e:
-        print("error: ", e)
+    dbConnection = GetDBConnection()
 
     # Push data in mysql db
     pushToDB(dbConnection, families)
@@ -619,8 +624,15 @@ def main():
     # commit db transactions
     dbConnection.commit()
 
+    dbConnection.close()
+
+    return
+
+def GetBeneficiarySchemesMapping():
+    schemes = LoadSchemes()
+    dbConnection = GetDBConnection()
     cursor = dbConnection.cursor()
-    scheme_beneficiaries = {}
+    schemeBeneficiaries = {}
     # get all the eligible members for each family using the inclusion criteria for the scheme
     for s in schemes:
         inclusionCriteria = s['inclusion_criteria']
@@ -656,17 +668,21 @@ def main():
         rows = cursor.fetchall()
         
         # populate respective fields for each beneficiary and calculate the proximity scores for each one of them
-        populateProximityScores(scheme_beneficiaries, rows, orderedColumnNames, criteriaColumns)
+        populateProximityScores(schemeBeneficiaries, rows, orderedColumnNames, criteriaColumns)
     
-    print(scheme_beneficiaries)
+    print(schemeBeneficiaries)
 
     cursor.close()
     dbConnection.close()
 
-    # scheme = random.choice(schemes)
-    # beneficiary = random.choice(beneficiaries)
-    # result = match(beneficiary, scheme)
-    # print(result)
+    return schemeBeneficiaries
+
+def main():
+    # LoadBeneficiaries('maago/data/survey_data_may.csv')
+    beneficiarySchemes = GetBeneficiarySchemesMapping()
+
+    print(beneficiarySchemes)
+
     return 0
 
 if __name__ == '__main__':
