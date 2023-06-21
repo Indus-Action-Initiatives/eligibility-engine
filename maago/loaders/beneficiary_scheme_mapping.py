@@ -31,11 +31,6 @@ def GetBeneficiarySchemesMapping():
             for v in values:
                 columns.add(v)
 
-        # generate criteria string
-        # criteria = [getCriterionStringFromCriteriaToken(c) for c in criteria]
-        # criteriaString = ', '.join(criteria)
-        # generate the select clause
-
         criteriaStrings = []
         for i, c in enumerate(criteria):
             criteriaStrings.append(
