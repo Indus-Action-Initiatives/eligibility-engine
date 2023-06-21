@@ -6,4 +6,10 @@ def getColumnsFromCriterion(criterion: str) -> list:
 
 
 def getOrderedColumnNamesFromTheSelectClause(fromClause):
-    return re.findall(' as \'?([\\w.]+)\'?', fromClause)
+    columnNames = re.findall(' as `([\\w.]+)`', fromClause)
+    uniqueColumnNames = []
+    for c in columnNames:
+        if c not in uniqueColumnNames:
+            uniqueColumnNames.append(c)
+    
+    return uniqueColumnNames
