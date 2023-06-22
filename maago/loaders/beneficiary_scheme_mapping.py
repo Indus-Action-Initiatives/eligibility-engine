@@ -4,6 +4,7 @@ from utils.normalization import normalizeString
 from utils.proximity_score import populateProximityScores
 from utils.re_utils import getColumnsFromCriterion, getOrderedColumnNamesFromTheSelectClause
 
+DEBUG = False
 def GetBeneficiarySchemesMapping():
     schemes = LoadSchemes()
     dbConnection = GetDBConnection()
@@ -55,6 +56,11 @@ def GetBeneficiarySchemesMapping():
         orderedColumnNames = getOrderedColumnNamesFromTheSelectClause(
             selectClause)
         
+        # DEBUG
+        whereClause = ''
+        if DEBUG:
+            whereClause = " WHERE fm.id='szYwdSaV'"
+        
         # if auxilliary columns wrap the main query with a CTE
         if len(auxilliaryColumns) > 0:            
             selectClause = 'WITH cte_query AS (%s) SELECT ' % (selectClause + ' ' + fromClause) + ', '.join(['`%s` as \'%s\'' % (c, c) for c in orderedColumnNames])
@@ -62,8 +68,8 @@ def GetBeneficiarySchemesMapping():
             # TODO: quote the columns in where clause in case of auxilliary columns
 
         selectClause = selectClause + (', ' if len(auxilliaryColumns) > 0 else '') + ', '.join(criteriaStrings) + ', ' + mainCriteriaString
-        eligibilityQuery = selectClause + ' ' + fromClause        
-
+        eligibilityQuery = selectClause + ' ' + fromClause + (whereClause if DEBUG else '')
+        
         # get values for each part of the select clause
         orderedColumnNames = getOrderedColumnNamesFromTheSelectClause(
             selectClause)        
@@ -74,7 +80,7 @@ def GetBeneficiarySchemesMapping():
         # populate respective fields for each beneficiary and calculate the proximity scores for each one of them
         populateProximityScores(schemeBeneficiaries,
                                 rows, orderedColumnNames, criteriaColumns)
-
+        
     print(schemeBeneficiaries)
 
     cursor.close()
