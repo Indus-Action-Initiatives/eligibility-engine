@@ -4,7 +4,6 @@ from utils.normalization import normalizeString
 from utils.proximity_score import populateProximityScores
 from utils.re_utils import getColumnsFromCriterion, getOrderedColumnNamesFromTheSelectClause
 
-
 def GetBeneficiarySchemesMapping():
     schemes = LoadSchemes()
     dbConnection = GetDBConnection()
@@ -12,6 +11,13 @@ def GetBeneficiarySchemesMapping():
     schemeBeneficiaries = {}
     # get all the eligible members for each family using the inclusion criteria for the scheme
     for s in schemes:
+        auxilliaryColumns = {}
+        acKeysFromScheme = list(filter(lambda k: 'auxilliary' in k, s.keys()))
+        for c in acKeysFromScheme:
+            if s[c] == '':
+                continue
+            key = c.split("_")[1]            
+            auxilliaryColumns[key] = s[c]
         inclusionCriteria = s['inclusion_criteria']
         criteria = getCriteriaTokensFromInclusionCriteria(inclusionCriteria)
         # TODO: Add exclusion criteria
@@ -25,24 +31,35 @@ def GetBeneficiarySchemesMapping():
             for v in values:
                 columns.add(v)
 
-        # generate criteria string
-        # criteria = [getCriterionStringFromCriteriaToken(c) for c in criteria]
-        # criteriaString = ', '.join(criteria)
-        # generate the select clause
-
         criteriaStrings = []
         for i, c in enumerate(criteria):
             criteriaStrings.append(
-                'CASE WHEN %s THEN 1 ELSE 0 END as criteria%d' % (c, i))
-        mainCriteriaString = '(CASE WHEN %s THEN 1 ELSE 0 END) as main_criteria' % inclusionCriteria
-        fromClause = 'FROM families as f INNER JOIN family_members as fm ON f.id = fm.family_id'
-        selectClause = 'SELECT \'%s\' as scheme_name, f.id as \'f.id\', fm.id as \'fm.id\', ' % s['name'] + ', '.join(
-            ['%s as \'%s\'' % (c, c) for c in columns]) + ', ' + ', '.join(criteriaStrings) + ', ' + mainCriteriaString
-        eligibilityQuery = selectClause + ' ' + fromClause
+                'CASE WHEN %s THEN 1 ELSE 0 END as `criteria%d`' % (c, i))
+        mainCriteriaString = '(CASE WHEN %s THEN 1 ELSE 0 END) as `main_criteria`' % inclusionCriteria
 
+        # from clause
+        fromClause = 'FROM families as f INNER JOIN family_members as fm ON f.id = fm.family_id'
+
+        # construct select clause
+        selectClause = 'SELECT \'%s\' as `scheme_name`, f.id as `f.id`, fm.id as `fm.id`, ' % s['name'] + ', '.join(
+            ['%s as `%s`' % (c, c) for c in columns]) + ', ' + ', '.join(['(%s) as `%s`' % (auxilliaryColumns[k], k) for k in auxilliaryColumns])
+        
         # get values for each part of the select clause
         orderedColumnNames = getOrderedColumnNamesFromTheSelectClause(
             selectClause)
+        
+        # if auxilliary columns wrap the main query with a CTE
+        if len(auxilliaryColumns) > 0:            
+            selectClause = 'WITH cte_query AS (%s) SELECT ' % (selectClause + ' ' + fromClause) + ', '.join(['`%s` as \'%s\'' % (c, c) for c in orderedColumnNames])
+            fromClause = 'FROM cte_query'
+            # TODO: quote the columns in where clause in case of auxilliary columns
+
+        selectClause = selectClause + (', ' if len(auxilliaryColumns) > 0 else '') + ', '.join(criteriaStrings) + ', ' + mainCriteriaString
+        eligibilityQuery = selectClause + ' ' + fromClause        
+
+        # get values for each part of the select clause
+        orderedColumnNames = getOrderedColumnNamesFromTheSelectClause(
+            selectClause)        
 
         cursor.execute(eligibilityQuery)
         rows = cursor.fetchall()

@@ -50,8 +50,8 @@ def populateProximityScores(schemeBeneficiaries, rows, orderedColumnNames, crite
         beneficiaryKey = '%s__%s' % (rowValues['f.id'], rowValues['fm.id'])
         schemeName = rowValues['scheme_name']
         beneficiary = {}
-        if beneficiaryKey not in schemeBeneficiaries:
-            beneficiary = {}
+        if beneficiaryKey in schemeBeneficiaries:
+            beneficiary = schemeBeneficiaries[beneficiaryKey]
         for i, c in enumerate(orderedColumnNames):
             if 'criteria' not in c:
                 beneficiary[c] = row[i]
