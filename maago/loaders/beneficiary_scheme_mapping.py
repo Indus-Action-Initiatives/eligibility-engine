@@ -25,11 +25,7 @@ def GetBeneficiarySchemesMapping():
         # get column from the criteria
         criteriaColumns = {}
         for i, c in enumerate(criteria):
-            criteriaColumns['criteria%d' % i] = getColumnsFromCriterion(c)
-        columns = set()
-        for values in criteriaColumns.values():
-            for v in values:
-                columns.add(v)
+            criteriaColumns['criteria%d' % i] = getColumnsFromCriterion(c)       
 
         criteriaStrings = []
         for i, c in enumerate(criteria):
@@ -40,9 +36,20 @@ def GetBeneficiarySchemesMapping():
         # from clause
         fromClause = 'FROM families as f INNER JOIN family_members as fm ON f.id = fm.family_id'
 
+        # TODO: This is ugly, bad, nasty. Need to do a better job with this.
         # construct select clause
-        selectClause = 'SELECT \'%s\' as `scheme_name`, f.id as `f.id`, fm.id as `fm.id`, ' % s['name'] + ', '.join(
-            ['%s as `%s`' % (c, c) for c in columns]) + ', ' + ', '.join(['(%s) as `%s`' % (auxilliaryColumns[k], k) for k in auxilliaryColumns])
+        selectClause = """SELECT \'%s\' as `scheme_name`,
+            f.id as `f.id`, f.caste as `f.caste`, f.caste_category as `f.caste_category`, f.pr_of_cg as `f.pr_of_cg`, 
+            f.has_residence_certificate as `f.has_residency_certificate`, f.ration_card_type as `f.ration_card_type`,
+            f.ptgo_or_pvtg as `f.ptgo_or_pvtg`, f.are_forest_dwellers as `f.are_forest_dwellers`, f.has_phone as `f.has_phone`,
+            f.has_neighbourhood_phone_number as `f.has_neighbourhood_phone_number`,
+            fm.id as `fm.id`, fm.name as `fm.name`, fm.dob as `fm.dob`, fm.gender as `fm.gender`, fm.family_role as `fm.family_role`, fm.disadvantaged as `fm.disadvantaged`,
+            fm.job as `fm.job`, fm.job_type as `fm.job_type`, fm.in_educational_institute as `fm.in_educational_institute`, fm.education_level as `fm.education_level`,
+            fm.prev_year_tenth as `fm.prev_year_tenth`, fm.prev_year_twelfth as `fm.prev_year_twelfth`, fm.tenth_percentage_marks as `fm.tenth_percentage_marks`,
+            fm.twelfth_percentage_marks as `fm.twelfth_percentage_marks`, fm.tenth_top_ten as `fm.tenth_top_ten`, fm.twelfth_top_ten as `fm.twelfth_top_ten`,
+            fm.has_bocw_card as `fm.has_bocw_card`, fm.bocw_card_issue_date as `fm.bocw_card_issue_date`, fm.has_uow_card as `fm.has_uow_card`, fm.uow_card_issue_date as `fm.uow_card_issue_date`,
+            fm.pregnancy as `fm.pregnancy`,          
+            """ % s['name'] + ', '.join(['(%s) as `%s`' % (auxilliaryColumns[k], k) for k in auxilliaryColumns])
         
         # get values for each part of the select clause
         orderedColumnNames = getOrderedColumnNamesFromTheSelectClause(
@@ -74,7 +81,6 @@ def GetBeneficiarySchemesMapping():
     dbConnection.close()
 
     return schemeBeneficiaries
-
 
 def match(beneficiary, scheme):
     print('chosen scheme: %s' % SchemeName(scheme))
