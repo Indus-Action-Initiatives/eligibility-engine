@@ -1,18 +1,15 @@
-from app.db import insert_location
-from loaders.config_loaders import get_config_mappings
-from app.db import insert_family, insert_family_member
+from app.db import insert_location, insert_family, insert_family_member
 from utils.beneficiary_utils import new_family
 from utils.csv import CSVLoader, getMappingFromCSVLoaderResponse
 from utils.db import GetDBConnection
 from utils.dictionary import getMappedDict, splitCombinedDict
 from utils.normalization import get_normalised_date_value, get_normalised_float_value, get_normalised_string_value, get_normalised_bool_value
 from utils.random import GetAlphaNumericString
-import web
+from utils import proximity_score
 
 from thefuzz import fuzz
 
 UNKNOWN_STRING = 'unknown'
-
 
 def LoadBeneficiariesFromFile(dataFileName, loadToDB=True):
     beneficiaries = []
@@ -143,7 +140,6 @@ def newFamily(beneficiary):
     pregnantWomensCombinedDict = getMappedDict(pregnancyMapping, beneficiary)
     # current data has a provision of only two pregnant women, so pass two
     pregnantWomen = splitCombinedDict(pregnantWomensCombinedDict, 2)
-    familyMembersNames = []
     for p in pregnantWomen:
         fuzzyScore = -999
         pIndex = -1
@@ -180,9 +176,8 @@ def newFamily(beneficiary):
     respondent['tenthTopTen'] = UNKNOWN_STRING
     respondent['twelfthTopTen'] = UNKNOWN_STRING
     respondent['jobType'] = UNKNOWN_STRING
-    respondent['tenthPercentageMarks'] = get_normalised_float_value('-1')
-    respondent['twelfthPercentageMarks'] = get_normalised_float_value('-1')
-
+    respondent['tenthPercentageMarks'] = get_normalised_float_value('-19')
+    respondent['twelfthPercentageMarks'] = get_normalised_float_value('-19')
     # add respondent to the family member
     family['members'].append(respondent)
 
@@ -221,13 +216,13 @@ def pushToDB(dbConnection, families):
 
         # HACK: Zero out empty strings for numeric columns
         if fLocation['pincode'] == '':
-            fLocation['pincode'] = '0'
+            fLocation['pincode'] = '-1111'
         if fLocation['wardNumber'] == '':
-            fLocation['wardNumber'] = '0'
+            fLocation['wardNumber'] = '-1111'
 
         createLocationQuery = """INSERT INTO locations (id, location_type, locality, pincode, ward_number, ward_name, village, survey_village_town_city) VALUES ('%s', '%s', '%s', %s, %s, '%s', '%s', '%s');""" % (locationID, fLocation['areaType'], fLocation['areaLocality'], fLocation['pincode'], fLocation['wardNumber'],
                                                                                                                                                                                                                     fLocation['wardName'], fLocation['village'], fLocation['surveyVillageTownCity'])
-
+        
         cursor.execute(createLocationQuery)
 
         # Create family for the row, get the family ID
@@ -253,7 +248,7 @@ def pushToDB(dbConnection, families):
         familyMembers = f['members']
         for m in familyMembers:
             # Treat name as the primary key in data
-            if m['name'] == '':
+            if m['name'] in ['', proximity_score.UNKNOWN_STRING]:
                 continue
             memberID = GetAlphaNumericString(8)
 
@@ -296,7 +291,7 @@ def pushToDB(dbConnection, families):
                 disadvantaged,
                 pregnancy,
                 job,
-                jobType,
+                job_type,
                 in_educational_institute,
                 education_level,
                 prev_year_tenth,

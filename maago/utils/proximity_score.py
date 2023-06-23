@@ -1,12 +1,16 @@
 from datetime import datetime
 
-
-UNKNOWN_SCORE = 0.001
-UNKNOWN_STRING = 'unknown'
-UNKNOWN_NUMBER = -111111
-UNKNOWN_DATE = datetime.strptime('01-01-1800', '%d-%m-%Y')
-PROXIMITY_SCORE_KEY = 'proximity_score'
-
+def InitGlobals():
+    global UNKNOWN_SCORE 
+    global UNKNOWN_STRING
+    global UNKNOWN_NUMBER
+    global UNKNOWN_DATE
+    global PROXIMITY_SCORE_KEY
+    UNKNOWN_SCORE = 0.001
+    UNKNOWN_STRING = 'unknown'
+    UNKNOWN_NUMBER = -19
+    UNKNOWN_DATE = datetime.strptime('30-08-1857', '%d-%m-%Y')
+    PROXIMITY_SCORE_KEY = 'proximity_score'
 
 def calculateProximityScore(rowValues, criteriaColumns):
     unknowns = [UNKNOWN_STRING, UNKNOWN_NUMBER, UNKNOWN_DATE, None]
@@ -24,7 +28,7 @@ def calculateProximityScore(rowValues, criteriaColumns):
             # stupid!
             #
             # we do not support any ORs right now, so just bailing out whenever
-            # any known failing criteria is found
+            # any known failing criteria is found            
             kColumns = criteriaColumns[k]
             guarenteedFailingCriteriaFound = False
             for c in kColumns:

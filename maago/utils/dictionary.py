@@ -1,3 +1,5 @@
+from utils import proximity_score
+
 # fm##1$$job
 INDIVIDUAL_SEPARATOR = "##"
 ATTRIBUTE_SEPARATOR = "$$"
@@ -5,13 +7,22 @@ ATTRIBUTE_SEPARATOR = "$$"
 # We are doing this so that no data is missed if any of he property is missing
 MAXIMUM_NUMBER_OF_FAMILY_MEMBERS = 6
 
-
 def getMappedDict(headerMapping, srcDict):
     destDict = {}
     for key in headerMapping.keys():
         if key in srcDict.keys():
             # TODO: Use typecasting
-            destDict[headerMapping[key]["dest"]] = srcDict[key]
+            # HACK: using unknown value directly in case of empty string
+            value = srcDict[key]
+            dataType = headerMapping[key]['dataType']
+            if value=='':
+                if dataType in ['string', 'bool']:
+                    value = proximity_score.UNKNOWN_STRING
+                elif dataType=='number':
+                    value = proximity_score.UNKNOWN_NUMBER
+                elif dataType=='date':
+                    value = proximity_score.UNKNOWN_DATE.strftime("%d-%m-%Y")
+            destDict[headerMapping[key]["dest"]] = value
     return destDict
 
 

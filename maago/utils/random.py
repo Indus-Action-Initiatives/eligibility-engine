@@ -8,5 +8,3 @@ def GetAlphaNumericString(n):
         string.ascii_uppercase + string.ascii_lowercase + string.digits) for _ in range(n))
 
     return randomString
-
-# get_normalised_date_value converts a date string into YYYY-mm-dd formatted string
