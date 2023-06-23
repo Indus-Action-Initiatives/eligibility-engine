@@ -1,8 +1,12 @@
+from app.db import insert_location
+from loaders.config_loaders import get_config_mappings
+from utils.beneficiary_utils import new_family
 from utils.csv import CSVLoader, getMappingFromCSVLoaderResponse
 from utils.db import GetDBConnection
 from utils.dictionary import getMappedDict, splitCombinedDict
 from utils.normalization import GetDBDateString, GetDBFloatString, GetNormalisedStringValue, GetNormalisedValue
 from utils.random import GetAlphaNumericString
+import web
 
 from thefuzz import fuzz
 
@@ -55,6 +59,18 @@ def PushBeneficiariesToDB(beneficiaries):
     dbConnection.commit()
 
     dbConnection.close()
+
+
+def load_beneficiaries_to_db(beneficiaries):
+    families = []
+    # For each beneficiary, create a structured (family) object out of it divided as family, respondent and family member data
+    for beneficiary in beneficiaries:
+        # For each beneficiary row construct a family object
+        family = new_family(beneficiary)
+
+        families.append(family)
+    return families
+    # pass
 
 
 def newFamily(beneficiary):
@@ -180,6 +196,14 @@ def newFamily(beneficiary):
 #         value = beneficiary[mappedHeaders[key]['dataHeader']]
 
 #     return value
+
+def load_family_to_db(family):
+    location = family['location']
+    if location['pincode'] == '':
+        location['pincode'] = '0'
+    if location['wardNumber'] == '':
+        location['wardNumber'] = '0'
+    insert_location(location)
 
 
 def pushToDB(dbConnection, families):
