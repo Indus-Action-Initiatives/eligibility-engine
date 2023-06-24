@@ -1,6 +1,6 @@
 from loaders.config_loaders import get_config_mappings
 from utils.dictionary import getMappedDict, splitCombinedDict
-from utils.normalization import GetDBFloatString
+from utils.normalization import get_normalised_float_value
 from thefuzz import fuzz
 
 config = get_config_mappings()
@@ -13,11 +13,11 @@ def new_family(beneficiary):
     family = beneficiary
     parentFound = determine_family_roles(family)
 
-    respondent = init_respondent(beneficiary, parentFound)
-    populate_pregnancy_status(family, respondent, beneficiary)
+    # respondent = init_respondent(beneficiary, parentFound)
+    populate_pregnancy_status(family, beneficiary)
 
     # add respondent to the family member
-    family['members'].append(respondent)
+    # family['members'].append(respondent)
     return family
 
 
@@ -84,8 +84,8 @@ def init_respondent(beneficiary, parentFound):
     respondent['tenthTopTen'] = UNKNOWN_STRING
     respondent['twelfthTopTen'] = UNKNOWN_STRING
     respondent['jobType'] = UNKNOWN_STRING
-    respondent['tenthPercentageMarks'] = GetDBFloatString('-1')
-    respondent['twelfthPercentageMarks'] = GetDBFloatString('-1')
+    respondent['tenthPercentageMarks'] = get_normalised_float_value('-1')
+    respondent['twelfthPercentageMarks'] = get_normalised_float_value('-1')
     return respondent
 
 
@@ -99,7 +99,7 @@ def determine_respondent_role(respondent, parentFound):
     return UNKNOWN_STRING
 
 
-def populate_pregnancy_status(family, respondent, beneficiary):
+def populate_pregnancy_status(family, beneficiary):
     # get the names of the pregnant women of the family from the pregnancy mapping
     pregnantWomenCombinedDict = getMappedDict(
         config['pregnancyMapping'], beneficiary)
@@ -107,16 +107,18 @@ def populate_pregnancy_status(family, respondent, beneficiary):
     pregnantWomen = splitCombinedDict(pregnantWomenCombinedDict, 2)
 
     for woman in pregnantWomen:
+        if 'name' not in woman:
+            return
         name = woman['name'].strip()
         if name == '':
             return
         fuzzyScore, index = fuzzy_matching(
-            name, family['members'] + [respondent])
+            name, family['members'])
         if index >= 0 and index < (len(family['members']) - 1):
             family['members'][index]['pregnancy'] = 'yes'
-        elif index == (len(family['members']) - 1):
-            respondent['pregnancy'] = 'yes'
-    for member in (family['members'] + [respondent]):
+        # elif index == (len(family['members']) - 1):
+        #     respondent['pregnancy'] = 'yes'
+    for member in (family['members']):
         if member['gender'] == 'male':
             member['pregnancy'] = 'no'
         elif 'pregnancy' not in member or member['pregnancy'] == '':

@@ -3,8 +3,8 @@ from utils.csv import CSVLoader, getMappingFromCSVLoaderResponse
 
 familyMapping = getMappingFromCSVLoaderResponse(
     CSVLoader('maago/config/familyMapping.csv'))
-familyJSONMapping = getMappingFromCSVLoaderResponse(
-    CSVLoader('maago/config/familyJSONMapping.csv'))
+# familyJSONMapping = getMappingFromCSVLoaderResponse(
+#     CSVLoader('maago/config/familyJSONMapping.csv'))
 locationMapping = getMappingFromCSVLoaderResponse(
     CSVLoader('maago/config/locationMapping.csv'))
 respondentMapping = getMappingFromCSVLoaderResponse(
@@ -18,7 +18,7 @@ pregnancyMapping = getMappingFromCSVLoaderResponse(
 def get_config_mappings():
     config = {
         "familyMapping": familyMapping,
-        "familyJSONMapping": familyJSONMapping,
+        # "familyJSONMapping": familyJSONMapping,
         "locationMapping": locationMapping,
         "respondentMapping": respondentMapping,
         "familyMembersMapping": familyMembersMapping,

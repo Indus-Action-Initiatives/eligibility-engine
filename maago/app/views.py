@@ -1,5 +1,6 @@
 import json
 from loaders.beneficiary_loaders import load_beneficiaries_to_db
+from loaders.beneficiary_scheme_mapping import get_beneficiary_scheme_mapping
 import web
 import io
 import csv
@@ -38,5 +39,6 @@ class ProximityScoreJSON:
     def POST(self):
         jsonFile = open("maago/input.json")
         data = json.load(jsonFile)
-        web.debug(load_beneficiaries_to_db(data['beneficiaries']))
+        load_beneficiaries_to_db(data['beneficiaries'])
+        web.debug(get_beneficiary_scheme_mapping())
         return web.seeother('/proximity_score/json')
