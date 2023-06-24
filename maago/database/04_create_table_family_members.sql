@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS family_members (
     disadvantaged bool_unk_enum,
     pregnancy bool_unk_enum,
     job VARCHAR(256),
-    jobType VARCHAR(128),
+    job_type VARCHAR(128),
     in_educational_institute bool_unk_enum,
     education_level VARCHAR(64),
     prev_year_tenth bool_unk_enum,

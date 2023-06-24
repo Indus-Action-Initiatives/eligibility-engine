@@ -25,8 +25,9 @@ class SingletonDuckDB:
     @staticmethod
     def _migrate():
         instance = SingletonDuckDB.get_instance()
-        os.chdir('maago/database')
-        sql_files = glob.glob("*.sql")
+        # os.listdir('maago/database')
+        sql_files = glob.glob("maago/database/*.sql")
+
         sql_files.sort()
 
         for file_path in sql_files:
@@ -79,9 +80,9 @@ def insert_location(location):
     query = """
         INSERT INTO locations
         (id, location_type, locality, pincode, ward_number, ward_name, village, survey_village_town_city) 
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        VALUES ('%s', '%s', '%s', %s, %s, '%s', '%s', '%s')
     """
-    db.execute(query, (
+    db.sql(query % (
         locationID,
         location['areaType'],
         location['areaLocality'],
@@ -97,14 +98,14 @@ def insert_location(location):
 def insert_family(family, locationID):
     db = SingletonDuckDB.get_instance()
     familyID = family['id']
+    # import pdb
+    # pdb.set_trace()
     query = """
         INSERT INTO families
         (id, location_id, caste, caste_category, pr_of_cg, has_residence_certificate, ration_card_type, ptgo_or_pvtg, are_forest_dwellers, has_phone, has_neighbourhood_phone_number)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s')
     """
-    import pdb
-    pdb.set_trace()
-    db.execute(query, {
+    db.sql(query % (
         familyID,
         locationID,
         family['caste'],
@@ -116,7 +117,7 @@ def insert_family(family, locationID):
         get_normalised_bool_value(family['areForestDwellers']),
         get_normalised_bool_value(family['hasPhone']),
         get_normalised_bool_value(str(family['neighbourhoodPhone'] != ''))
-    })
+    ))
     return familyID
 
 
@@ -127,11 +128,10 @@ def insert_family_member(member, familyID):
     memberID = GetAlphaNumericString(8)
     query = """
         INSERT INTO family_members
-        ('id, family_id, name, dob, gender, family_role, disadvantaged, pregnancy, job, jobType, in_educational_institute, education_level, prev_year_tenth, prev_year_twelfth, tenth_percentage_marks, twelfth_percentage_marks, tenth_top_ten, twelfth_top_ten, has_bocw_card, bocw_card_issue_date, has_uow_card, uow_card_issue_date)
-        VALUES
-        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        (id, family_id, name, dob, gender, family_role, disadvantaged, pregnancy, job, job_type, in_educational_institute, education_level, prev_year_tenth, prev_year_twelfth, tenth_percentage_marks, twelfth_percentage_marks, tenth_top_ten, twelfth_top_ten, has_bocw_card, bocw_card_issue_date, has_uow_card, uow_card_issue_date)
+        VALUES ('%s', '%s', '%s', %s, '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', %s, %s, '%s', '%s', '%s', %s, '%s', %s)
     """
-    db.execute(query, {
+    db.sql(query % (
         memberID,
         familyID,
         member['name'],
@@ -154,11 +154,12 @@ def insert_family_member(member, familyID):
         get_normalised_date_value(member['bocwCardIssueDate']),
         get_normalised_bool_value(member['hasUOWCard']),
         get_normalised_date_value(member['uowCardIssueDate'])
-    })
+    ))
     return memberID
 
 
 def execute_custom_query(query):
     db = SingletonDuckDB.get_instance()
+    print(query)
     res = db.sql(query)
-    return res.fetchall()
+    return res.fetchdf()

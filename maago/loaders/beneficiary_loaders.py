@@ -206,7 +206,7 @@ def load_family_to_db(family):
         location['wardNumber'] = '0'
     locationID = insert_location(location)
     familyID = insert_family(family, locationID)
-    for member in family['member']:
+    for member in family['members']:
         insert_family_member(member, familyID)
 
 
