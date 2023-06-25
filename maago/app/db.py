@@ -26,7 +26,19 @@ class SingletonDuckDB:
     def _migrate():
         instance = SingletonDuckDB.get_instance()
         # os.listdir('maago/database')
-        sql_files = glob.glob("maago/database/*.sql")
+        sql_files = glob.glob("maago/database/migrations/*.sql")
+
+        sql_files.sort()
+
+        for file_path in sql_files:
+            with open(file_path, 'r') as file:
+                sql = file.read()
+                instance.execute(sql)
+
+    @staticmethod
+    def cleanup():
+        instance = SingletonDuckDB.get_instance()
+        sql_files = glob.glob("maago/database/cleanup/*.sql")
 
         sql_files.sort()
 

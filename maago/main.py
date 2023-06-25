@@ -3,8 +3,9 @@ import app.views
 
 urls = (
     '/schemes', app.views.SchemeListView,
-    '/proximity_score/csv', app.views.ProximityScoreCSV,
-    '/proximity_score/json', app.views.ProximityScoreJSON
+    '/schemes/bulk', app.views.SchemeBulkAddView,
+    # '/proximity_score/csv', app.views.ProximityScoreCSV,
+    '/proximity_score/json', app.views.ProximityScoreJSONView
 )
 
 if __name__ == '__main__':

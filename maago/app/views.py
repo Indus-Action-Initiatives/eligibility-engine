@@ -19,27 +19,37 @@ class SchemeListView:
         return json.dumps(data)
 
 
-class ProximityScoreCSV:
-    def GET(self):
-        return '<h1>Test Get</h1>'
+class SchemeBulkAddView:
+    def POST(self):
+        data = json.loads(web.data())
+        for s in data:
+            insert_scheme(s)
+        return json.dumps(data)
+
+
+# class ProximityScoreCSV:
+#     def GET(self):
+#         return '<h1>Test Get</h1>'
+
+#     def POST(self):
+#         data = json.loads(web.data())
+#         csv_content = data['content']
+#         csv_file = io.StringIO(csv_content)
+#         csv_reader = csv.DictReader(csv_file)
+
+#         schemes = get_all_schemes()
+#         return web.seeother('proximity_score/csv')
+
+
+class ProximityScoreJSONView:
+    # def GET(self, res={}):
+    #     return json.dumps(res)
 
     def POST(self):
         data = json.loads(web.data())
-        csv_content = data['content']
-        csv_file = io.StringIO(csv_content)
-        csv_reader = csv.DictReader(csv_file)
-
-        schemes = get_all_schemes()
-        return web.seeother('proximity_score/csv')
-
-
-class ProximityScoreJSON:
-    def GET(self, res={}):
-        return json.dumps(res)
-
-    def POST(self):
-        jsonFile = open("maago/input.json")
-        data = json.load(jsonFile)
+        if not data:
+            jsonFile = open("maago/input.json")
+            data = json.load(jsonFile)
         load_beneficiaries_to_db(data['beneficiaries'])
         rows, orderedColumns, criteriaColumns = get_beneficiary_scheme_mapping()
         schemeBeneficiaries = {}

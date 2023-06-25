@@ -1,5 +1,5 @@
 from loaders.scheme_loaders import LoadSchemes, SchemeName, getCriteriaTokensFromInclusionCriteria
-from app.db import get_all_schemes, execute_custom_query
+from app.db import get_all_schemes, execute_custom_query, SingletonDuckDB
 from utils.db import GetDBConnection
 from utils.normalization import normalizeString
 from utils.proximity_score import populateProximityScores
@@ -19,6 +19,7 @@ def get_beneficiary_scheme_mapping():
         orderedColumns = orderedColumnNames
         schemeBeneficiariesDF = execute_custom_query(eligibilityQuery)
         schemeBeneficiaries = df_to_dict(schemeBeneficiariesDF)
+    SingletonDuckDB.cleanup()
     return schemeBeneficiaries, orderedColumns, criteriaColumns
 
 
