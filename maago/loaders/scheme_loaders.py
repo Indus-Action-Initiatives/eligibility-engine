@@ -69,3 +69,8 @@ def getCriteriaTokensFromInclusionCriteria(criteria: str):
             openingParentheses = closingParentheses = 0
 
     return tokens
+
+
+def getCriteriaTokensFromScheme(scheme):
+    inclusionCriteria = scheme['inclusion_criteria']
+    return getCriteriaTokensFromInclusionCriteria(inclusionCriteria)

@@ -1,5 +1,6 @@
 from datetime import datetime
 
+
 UNKNOWN_SCORE = 0.001
 UNKNOWN_STRING = 'unknown'
 UNKNOWN_NUMBER = -111111
@@ -44,20 +45,21 @@ def calculateProximityScore(rowValues, criteriaColumns):
 
 def populateProximityScores(schemeBeneficiaries, rows, orderedColumnNames, criteriaColumns):
     for row in rows:
-        rowValues = {}
-        for i, c in enumerate(orderedColumnNames):
-            rowValues[c] = row[i]
+        rowValues = row
+        # for i, c in enumerate(orderedColumnNames):
+        #     rowValues[c] = row[i]
+
         beneficiaryKey = '%s__%s' % (rowValues['f.id'], rowValues['fm.id'])
         schemeName = rowValues['scheme_name']
         beneficiary = {}
         if beneficiaryKey in schemeBeneficiaries:
             beneficiary = schemeBeneficiaries[beneficiaryKey]
-        for i, c in enumerate(orderedColumnNames):
-            if 'criteria' not in c:
-                beneficiary[c] = row[i]
+        for i, (key, v) in enumerate(row.items()):
+            if 'criteria' not in key:
+                beneficiary[key] = row[key]
             else:
                 # TODO: Add description of the criteria as well.
-                beneficiary['%s__%s' % (schemeName, c)] = row[i]
+                beneficiary['%s__%s' % (schemeName, key)] = row[key]
         if rowValues['main_criteria'] == 1:
             beneficiary['%s__%s' % (schemeName, PROXIMITY_SCORE_KEY)] = 1
         else:

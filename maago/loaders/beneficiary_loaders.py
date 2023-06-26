@@ -1,8 +1,13 @@
+from app.db import insert_location
+from loaders.config_loaders import get_config_mappings
+from app.db import insert_family, insert_family_member
+from utils.beneficiary_utils import new_family
 from utils.csv import CSVLoader, getMappingFromCSVLoaderResponse
 from utils.db import GetDBConnection
 from utils.dictionary import getMappedDict, splitCombinedDict
-from utils.normalization import GetDBDateString, GetDBFloatString, GetNormalisedStringValue, GetNormalisedValue
+from utils.normalization import get_normalised_date_value, get_normalised_float_value, get_normalised_string_value, get_normalised_bool_value
 from utils.random import GetAlphaNumericString
+import web
 
 from thefuzz import fuzz
 
@@ -55,6 +60,18 @@ def PushBeneficiariesToDB(beneficiaries):
     dbConnection.commit()
 
     dbConnection.close()
+
+
+def load_beneficiaries_to_db(beneficiaries):
+    families = []
+    # For each beneficiary, create a structured (family) object out of it divided as family, respondent and family member data
+    for beneficiary in beneficiaries:
+        # For each beneficiary row construct a family object
+        family = new_family(beneficiary)
+        load_family_to_db(family)
+        families.append(family)
+    return families
+    # pass
 
 
 def newFamily(beneficiary):
@@ -163,8 +180,8 @@ def newFamily(beneficiary):
     respondent['tenthTopTen'] = UNKNOWN_STRING
     respondent['twelfthTopTen'] = UNKNOWN_STRING
     respondent['jobType'] = UNKNOWN_STRING
-    respondent['tenthPercentageMarks'] = GetDBFloatString('-1')
-    respondent['twelfthPercentageMarks'] = GetDBFloatString('-1')
+    respondent['tenthPercentageMarks'] = get_normalised_float_value('-1')
+    respondent['twelfthPercentageMarks'] = get_normalised_float_value('-1')
 
     # add respondent to the family member
     family['members'].append(respondent)
@@ -180,6 +197,17 @@ def newFamily(beneficiary):
 #         value = beneficiary[mappedHeaders[key]['dataHeader']]
 
 #     return value
+
+def load_family_to_db(family):
+    location = family['location']
+    if location['pincode'] == '':
+        location['pincode'] = '0'
+    if location['wardNumber'] == '':
+        location['wardNumber'] = '0'
+    locationID = insert_location(location)
+    familyID = insert_family(family, locationID)
+    for member in family['members']:
+        insert_family_member(member, familyID)
 
 
 def pushToDB(dbConnection, families):
@@ -206,14 +234,14 @@ def pushToDB(dbConnection, families):
         familyID = f['id']
 
         # calculate boolean columns prOfCG, hasPhone, hasResidenceCertificate, hasNeighbourhoodPhone, ptgoOrPVTG, areForestDwellers
-        prOfCG = GetNormalisedValue(f['prOfCG'])
-        hasPhone = GetNormalisedValue(f['hasPhone'])
-        hasResidenceCertificate = GetNormalisedValue(
+        prOfCG = get_normalised_bool_value(f['prOfCG'])
+        hasPhone = get_normalised_bool_value(f['hasPhone'])
+        hasResidenceCertificate = get_normalised_bool_value(
             f['hasResidenceCertificate'])
-        hasNeighbourhoodPhoneNumber = GetNormalisedValue(
+        hasNeighbourhoodPhoneNumber = get_normalised_bool_value(
             str(f['neighbourhoodPhone'] != ''))
-        ptgoOrPVTG = GetNormalisedValue(f['ptgoOrPVTG'])
-        areForestDwellers = GetNormalisedValue(f['areForestDwellers'])
+        ptgoOrPVTG = get_normalised_bool_value(f['ptgoOrPVTG'])
+        areForestDwellers = get_normalised_bool_value(f['areForestDwellers'])
 
         createFamilyQuery = """INSERT INTO families (id, location_id, caste, caste_category, pr_of_cg, has_residence_certificate, ration_card_type, ptgo_or_pvtg, are_forest_dwellers, has_phone, has_neighbourhood_phone_number) VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s')""" % (
             familyID, locationID, f['caste'],  f['casteCategory'], prOfCG, hasResidenceCertificate, f[
@@ -233,27 +261,29 @@ def pushToDB(dbConnection, families):
             # disadvantaged, inEducationalInstitute, prevYearTenth, prevYearTwelfth
             # tenthTopTen, twelfthTopTen
             # hasBOCWCard, hasUOWCard
-            disadvantaged = GetNormalisedValue(m['disadvantaged'])
-            inEducationalInstitute = GetNormalisedValue(
+            disadvantaged = get_normalised_bool_value(m['disadvantaged'])
+            inEducationalInstitute = get_normalised_bool_value(
                 m['inEducationalInstitute'])
-            prevYearTenth = GetNormalisedValue(m['prevYearTenth'])
-            prevYearTwelfth = GetNormalisedValue(m['prevYearTwelfth'])
-            tenthTopTen = GetNormalisedValue(m['tenthTopTen'])
-            twelfthTopTen = GetNormalisedValue(m['twelfthTopTen'])
-            hasBOCWCard = GetNormalisedValue(m['hasBOCWCard'])
-            hasUOWCard = GetNormalisedValue(m['hasUOWCard'])
-            pregnancy = GetNormalisedValue(m['pregnancy'])
+            prevYearTenth = get_normalised_bool_value(m['prevYearTenth'])
+            prevYearTwelfth = get_normalised_bool_value(m['prevYearTwelfth'])
+            tenthTopTen = get_normalised_bool_value(m['tenthTopTen'])
+            twelfthTopTen = get_normalised_bool_value(m['twelfthTopTen'])
+            hasBOCWCard = get_normalised_bool_value(m['hasBOCWCard'])
+            hasUOWCard = get_normalised_bool_value(m['hasUOWCard'])
+            pregnancy = get_normalised_bool_value(m['pregnancy'])
 
             # calculate date columns
             # dob, bocwCardIssueDate, uowCardIssueDate
-            dob = GetDBDateString(m['dob'])
-            bocwCardIssueDate = GetDBDateString(m['bocwCardIssueDate'])
-            uowCardIssueDate = GetDBDateString(m['uowCardIssueDate'])
+            dob = get_normalised_date_value(m['dob'])
+            bocwCardIssueDate = get_normalised_date_value(
+                m['bocwCardIssueDate'])
+            uowCardIssueDate = get_normalised_date_value(m['uowCardIssueDate'])
 
             # calculate numerical columns
             # tenthPercentageMarks, twelfthPercentageMarks
-            tenthPercentageMarks = GetDBFloatString(m['tenthPercentageMarks'])
-            twelfthPercentageMarks = GetDBFloatString(
+            tenthPercentageMarks = get_normalised_float_value(
+                m['tenthPercentageMarks'])
+            twelfthPercentageMarks = get_normalised_float_value(
                 m['twelfthPercentageMarks'])
 
             createFamilyMemberQuery = """INSERT INTO family_members (
@@ -302,7 +332,7 @@ def pushToDB(dbConnection, families):
                 %s,
                 '%s',
                 %s
-            )""" % (memberID, familyID, m['name'], dob, GetNormalisedStringValue(m['gender']), m['familyRole'], disadvantaged, pregnancy, m['job'],
+            )""" % (memberID, familyID, m['name'], dob, get_normalised_string_value(m['gender']), m['familyRole'], disadvantaged, pregnancy, m['job'],
                     m['jobType'], inEducationalInstitute, m['educationLevel'], prevYearTenth,
                     prevYearTwelfth, tenthPercentageMarks, twelfthPercentageMarks, tenthTopTen,
                     twelfthTopTen, hasBOCWCard, bocwCardIssueDate, hasUOWCard, uowCardIssueDate)

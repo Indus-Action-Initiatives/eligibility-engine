@@ -1,6 +1,6 @@
-CREATE TABLE locations (
+CREATE TABLE IF NOT EXISTS locations (
     id VARCHAR(8),
-    location_type ENUM('rural', 'urban'),
+    location_type loc_typ_enum,
     locality VARCHAR(256),
     pincode INT,
     ward_number SMALLINT,

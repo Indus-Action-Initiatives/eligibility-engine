@@ -9,4 +9,4 @@ def GetAlphaNumericString(n):
 
     return randomString
 
-# GetDBDateString converts a date string into YYYY-mm-dd formatted string
+# get_normalised_date_value converts a date string into YYYY-mm-dd formatted string

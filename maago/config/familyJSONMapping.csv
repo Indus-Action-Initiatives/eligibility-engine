@@ -1,0 +1,11 @@
+src,dest,dataType
+id,id,string
+caste,caste,string
+prOfCg,prOfCG,bool
+hasPhone,hasPhone,bool
+rationCardType,rationCardType,string
+hasResidencecertificate,hasResidenceCertificate,bool
+casteCategory,casteCategory,string
+neighbourhoodPhone,neighbourhoodPhone,string
+ptgoOrPVTG,ptgoOrPVTG,bool
+areForestDwellers,areForestDwellers,bool
