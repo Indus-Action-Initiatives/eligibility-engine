@@ -5,7 +5,9 @@
 
 import sys
 from loaders.beneficiary_scheme_mapping import GetBeneficiarySchemesMapping
+from loaders.beneficiary_loaders import LoadBeneficiariesFromFile
 import csv
+from utils.proximity_score import InitGlobals
 
 entities = {
     "id": [],
@@ -117,9 +119,9 @@ def getEntityForHeader(header):
 +--------------------------+----------------------------------------------------------------+------+-----+---------+-------+
         """
 
-
 def main():
-    # LoadBeneficiaries('maago/data/survey_data_may.csv')
+    InitGlobals()
+    LoadBeneficiariesFromFile('maago/data/survey_data_may.csv')
     beneficiarySchemes = GetBeneficiarySchemesMapping()    
     
     # get the schema
