@@ -1,4 +1,5 @@
 from utils import proximity_score
+from datetime import datetime
 
 # fm##1$$job
 INDIVIDUAL_SEPARATOR = "##"
@@ -7,6 +8,13 @@ ATTRIBUTE_SEPARATOR = "$$"
 # We are doing this so that no data is missed if any of he property is missing
 MAXIMUM_NUMBER_OF_FAMILY_MEMBERS = 6
 
+UNKNOWN_SCORE = 0.001
+UNKNOWN_STRING = "unknown"
+UNKNOWN_NUMBER = -19
+UNKNOWN_DATE = datetime.strptime("30-08-1857", "%d-%m-%Y")
+PROXIMITY_SCORE_KEY = "proximity_score"
+
+
 def getMappedDict(headerMapping, srcDict):
     destDict = {}
     for key in headerMapping.keys():
@@ -14,14 +22,14 @@ def getMappedDict(headerMapping, srcDict):
             # TODO: Use typecasting
             # HACK: using unknown value directly in case of empty string
             value = srcDict[key]
-            dataType = headerMapping[key]['dataType']
-            if value=='':
-                if dataType in ['string', 'bool']:
-                    value = proximity_score.UNKNOWN_STRING
-                elif dataType=='number':
-                    value = proximity_score.UNKNOWN_NUMBER
-                elif dataType=='date':
-                    value = proximity_score.UNKNOWN_DATE.strftime("%d-%m-%Y")
+            dataType = headerMapping[key]["dataType"]
+            if value == "":
+                if dataType in ["string", "bool"]:
+                    value = UNKNOWN_STRING
+                elif dataType == "number":
+                    value = UNKNOWN_NUMBER
+                elif dataType == "date":
+                    value = UNKNOWN_DATE.strftime("%d-%m-%Y")
             destDict[headerMapping[key]["dest"]] = value
     return destDict
 

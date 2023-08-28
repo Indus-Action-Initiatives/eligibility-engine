@@ -1,4 +1,5 @@
 cheroot==10.0.0
+duckdb==0.8.1
 jaraco.functools==3.7.0
 more-itertools==9.1.0
 mysql-connector-python==8.0.33

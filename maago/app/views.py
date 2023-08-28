@@ -41,7 +41,7 @@ class SchemeBulkAddView:
 #         return web.seeother('proximity_score/csv')
 
 
-class ProximityScoreJSONView:
+class ProximityScoreCGRTEPlusJSONView:
     # def GET(self, res={}):
     #     return json.dumps(res)
 
@@ -49,7 +49,7 @@ class ProximityScoreJSONView:
         data = json.loads(web.data())
         if not data:
             jsonFile = open("maago/input.json")
-            data = json.load(jsonFile)
+            data = json.load(jsonFile)        
         load_beneficiaries_to_db(data['beneficiaries'])
         rows, orderedColumns, criteriaColumns = get_beneficiary_scheme_mapping()
         schemeBeneficiaries = {}
