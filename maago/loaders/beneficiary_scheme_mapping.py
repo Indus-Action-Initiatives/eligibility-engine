@@ -23,7 +23,7 @@ def get_beneficiary_scheme_mapping():
     schemeBeneficiaries = {}
     criteriaColumns = {}
     for scheme in schemes:
-        auxilliaryColumns = get_scheme_columns(scheme)
+        auxilliaryColumns = get_scheme_auxilliary_columns(scheme)
         criteriaColumns, criteriaStrings = get_criteria(scheme)
         eligibilityQuery, orderedColumnNames = generate_eligibility_query(
             scheme, auxilliaryColumns, criteriaStrings
@@ -36,9 +36,7 @@ def get_beneficiary_scheme_mapping():
     return schemeBeneficiaries, orderedColumns, criteriaColumns
 
 
-def get_scheme_columns(scheme):
-    print(scheme["name"])
-    print(scheme)
+def get_scheme_auxilliary_columns(scheme):
     acKeysFromScheme = [key for key in scheme.keys() if "auxilliary" in key]
     auxilliaryColumns = {
         key.split("_")[1]: scheme[key] for key in acKeysFromScheme if scheme[key]

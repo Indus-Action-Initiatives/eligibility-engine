@@ -6,6 +6,7 @@ import web
 import io
 import csv
 from app.db import get_all_schemes, insert_scheme
+from projects.cg_rte_plus.loader import CGRTEPlusLoader
 
 
 class SchemeListView:
@@ -42,19 +43,19 @@ class SchemeBulkAddView:
 
 
 class ProximityScoreCGRTEPlusJSONView:
-    # def GET(self, res={}):
-    #     return json.dumps(res)
-
     def POST(self):
         data = json.loads(web.data())
         if not data:
-            jsonFile = open("maago/input.json")
-            data = json.load(jsonFile)        
-        load_beneficiaries_to_db(data['beneficiaries'])
-        rows, orderedColumns, criteriaColumns = get_beneficiary_scheme_mapping()
+            jsonFile = open("maago/projects/cg_rte_plus/config/input.json")
+            data = json.load(jsonFile)
+
+        loader = CGRTEPlusLoader()
+        loader.load_schemes()
+        loader.load_beneficiaries(data["beneficiaries"])
+        rows, orderedColumns, criteriaColumns = loader.get_beneficiary_scheme_mapping()
         schemeBeneficiaries = {}
-        # populate respective fields for each beneficiary and calculate the proximity scores for each one of them
-        populateProximityScores(schemeBeneficiaries, rows,
-                                orderedColumns, criteriaColumns)
+        populateProximityScores(
+            schemeBeneficiaries, rows, orderedColumns, criteriaColumns
+        )
         web.debug(schemeBeneficiaries)
         return json.dumps(schemeBeneficiaries)
