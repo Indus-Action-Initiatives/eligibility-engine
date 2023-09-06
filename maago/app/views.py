@@ -1,12 +1,9 @@
 import json
-from loaders.beneficiary_loaders import load_beneficiaries_to_db
-from loaders.beneficiary_scheme_mapping import get_beneficiary_scheme_mapping
 from utils.proximity_score import populateProximityScores
 import web
-import io
-import csv
 from app.db import get_all_schemes, insert_scheme
 from projects.cg_rte_plus.loader import CGRTEPlusLoader
+from projects.bocw.loader import BOCWLoader
 
 
 class SchemeListView:
@@ -58,4 +55,25 @@ class ProximityScoreCGRTEPlusJSONView:
             schemeBeneficiaries, rows, orderedColumns, criteriaColumns
         )
         web.debug(schemeBeneficiaries)
+        loader.cleanup()
+        return json.dumps(schemeBeneficiaries)
+
+
+class ProximityScoreBoCWJSONView:
+    def POST(self):
+        data = json.loads(web.data())
+        if not data:
+            jsonFile = open("maago/projects/bocw/config/input.json")
+            data = json.load(jsonFile)
+
+        loader = BOCWLoader()
+        loader.load_schemes()
+        loader.load_beneficiaries(data["beneficiaries"])
+        rows, orderedColumns, criteriaColumns = loader.get_beneficiary_scheme_mapping()
+        schemeBeneficiaries = {}
+        populateProximityScores(
+            schemeBeneficiaries, rows, orderedColumns, criteriaColumns
+        )
+        web.debug(schemeBeneficiaries)
+        loader.cleanup()
         return json.dumps(schemeBeneficiaries)

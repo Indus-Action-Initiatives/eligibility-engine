@@ -5,7 +5,7 @@ from utils.dictionary import getMappedDict, splitCombinedDict
 from utils.beneficiary_utils import fuzzy_matching
 from utils.re_utils import getOrderedColumnNamesFromTheSelectClause
 from utils.csv import CSVLoader
-from app.db import SingletonDuckDB
+from projects.cg_rte_plus.db.db import CGRTEPlusSingletonDuckDB
 from utils.random import GetAlphaNumericString
 from utils.normalization import (
     get_normalised_bool_value,
@@ -98,7 +98,7 @@ class CGRTEPlusLoader(ProjectLoader):
         return family
 
     def __insert_location(self, location):
-        db = SingletonDuckDB.get_instance()
+        db = CGRTEPlusSingletonDuckDB.get_instance()
         locationID = GetAlphaNumericString(8)
         query = """
             INSERT INTO locations
@@ -121,7 +121,7 @@ class CGRTEPlusLoader(ProjectLoader):
         return locationID
 
     def __insert_family(self, family, locationID):
-        db = SingletonDuckDB.get_instance()
+        db = CGRTEPlusSingletonDuckDB.get_instance()
         familyID = family["id"]
         query = """
             INSERT INTO families
@@ -147,7 +147,7 @@ class CGRTEPlusLoader(ProjectLoader):
         return familyID
 
     def __insert_family_member(self, member, familyID):
-        db = SingletonDuckDB.get_instance()
+        db = CGRTEPlusSingletonDuckDB.get_instance()
         if "name" not in member or not member["name"]:
             return
         memberID = GetAlphaNumericString(8)
@@ -263,3 +263,8 @@ class CGRTEPlusLoader(ProjectLoader):
         eligibilityQuery = selectClause + " " + fromClause
 
         return eligibilityQuery, orderedColumnNames
+
+    def cleanup(self):
+        super().cleanup()
+        CGRTEPlusSingletonDuckDB.cleanup()
+        return

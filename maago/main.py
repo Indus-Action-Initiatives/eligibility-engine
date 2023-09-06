@@ -10,7 +10,8 @@ urls = (
     # '/proximity_score/csv', app.views.ProximityScoreCSV,
     "/proximity_score/cg_rte_plus/json",
     app.views.ProximityScoreCGRTEPlusJSONView,
-    # '/proximity_score/bocw/json', app.views.ProximityScoreBOCWJSONView
+    "/proximity_score/bocw/json",
+    app.views.ProximityScoreBoCWJSONView,
 )
 
 if __name__ == "__main__":

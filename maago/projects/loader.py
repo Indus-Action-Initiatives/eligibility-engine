@@ -1,5 +1,5 @@
 from abc import abstractmethod
-from app.db import SingletonDuckDB, execute_custom_query
+from app.db import execute_custom_query
 from loaders.beneficiary_scheme_mapping import get_criteria, df_to_dict
 
 PROXIMITY_SCORE_KEY = "proximity_score"
@@ -20,6 +20,10 @@ class ProjectLoader:
 
     @abstractmethod
     def generate_eligibility_query(self):
+        pass
+
+    @abstractmethod
+    def cleanup(self):
         pass
 
     def __get_scheme_auxilliary_columns(self, scheme):
@@ -62,7 +66,6 @@ class ProjectLoader:
             # Execute eligibility query
             schemeBeneficiariesDF = execute_custom_query(eligibilityQuery)
             schemeBeneficiaries = df_to_dict(schemeBeneficiariesDF)
-        SingletonDuckDB.cleanup()
         return schemeBeneficiaries, orderedColumns, criteriaColumns
 
     # # this method must be called only after the beneficiaries and the schemes are loaded
