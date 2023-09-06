@@ -2,12 +2,12 @@
   "beneficiaries": [
     {
       "id": "6457727c0fb1a5001bf1ee4f",
-      "age": 12,
-      "gender": "male",
+      "age": 21,
+      "gender": "female",
       "occupation": "Construction worker",
       "marital_status": "Married",
       "pregnancy_status": "Pregnant",
-      "bocw_card_registration": "01-01-1986",
+      "bocw_card_registration_date": "01-01-1986",
       "health_status": "alive",
       "number_of_children": 1,
       "children_school_or_college": "school",
