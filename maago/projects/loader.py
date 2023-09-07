@@ -23,6 +23,10 @@ class ProjectLoader:
         pass
 
     @abstractmethod
+    def execute_custom_query(self):
+        pass
+
+    @abstractmethod
     def cleanup(self):
         pass
 
@@ -64,7 +68,7 @@ class ProjectLoader:
             )
             orderedColumns = orderedColumnNames
             # Execute eligibility query
-            schemeBeneficiariesDF = execute_custom_query(eligibilityQuery)
+            schemeBeneficiariesDF = self.execute_custom_query(eligibilityQuery)
             schemeBeneficiaries = df_to_dict(schemeBeneficiariesDF)
         return schemeBeneficiaries, orderedColumns, criteriaColumns
 

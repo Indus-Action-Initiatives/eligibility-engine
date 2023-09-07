@@ -10,6 +10,7 @@ CREATE TABLE IF NOT EXISTS family_members (
     number_of_children INT,
     children_school_or_college school_college_enum,
     spouse_alive bool_unk_enum,
+    occupation_of_surviving_spouse VARCHAR(256),
     receiving_pension bool_unk_enum,
     receiving_government_aid bool_unk_enum,
     home_ownership_status home_ownership_enum,

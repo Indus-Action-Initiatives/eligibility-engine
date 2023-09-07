@@ -268,3 +268,9 @@ class CGRTEPlusLoader(ProjectLoader):
         super().cleanup()
         CGRTEPlusSingletonDuckDB.cleanup()
         return
+
+    def execute_custom_query(self, query):
+        db = CGRTEPlusSingletonDuckDB.get_instance()
+        print(query + "\n\n")
+        res = db.sql(query)
+        return res.fetchdf()

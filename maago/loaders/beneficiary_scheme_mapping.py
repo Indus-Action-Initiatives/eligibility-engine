@@ -46,9 +46,17 @@ def get_scheme_auxilliary_columns(scheme):
 
 
 def df_to_dict(df):
-    df["fm.dob"] = df["fm.dob"].astype(str)
-    df["fm.uow_card_issue_date"] = df["fm.uow_card_issue_date"].astype(str)
-    df["fm.bocw_card_issue_date"] = df["fm.bocw_card_issue_date"].astype(str)
+    keys = df.keys()
+    if "fm.dob" in keys:
+        df["fm.dob"] = df["fm.dob"].astype(str)
+    if "fm.uow_card_issue_date" in keys:
+        df["fm.uow_card_issue_date"] = df["fm.uow_card_issue_date"].astype(str)
+    if "fm.bocw_card_issue_date" in keys:
+        df["fm.bocw_card_issue_date"] = df["fm.bocw_card_issue_date"].astype(str)
+    if "fm.bocw_card_registration_date" in keys:
+        df["fm.bocw_card_registration_date"] = df[
+            "fm.bocw_card_registration_date"
+        ].astype(str)
     df = df.fillna(np.nan).replace([np.nan], [None])
     return df.to_dict("records")
 
