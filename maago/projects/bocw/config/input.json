@@ -16,6 +16,23 @@
       "receiving_pension": true,
       "receiving_government_aid": true,
       "home_ownership_status": "Home Owner"
+    },
+    {
+      "id": "6457727c0fb1a5001bf1eef4",
+      "age": 21,
+      "gender": "female",
+      "occupation": "Construction worker",
+      "marital_status": "Married",
+      "pregnancy_status": "Pregnant",
+      "bocw_card_registration_date": "01-01-1986",
+      "health_status": "Deceased",
+      "number_of_children": 1,
+      "children_school_or_college": "school",
+      "spouse_alive": true,
+      "occupation_of_surviving_spouse": "teacher",
+      "receiving_pension": true,
+      "receiving_government_aid": true,
+      "home_ownership_status": "Home Owner"
     }
   ]
 }

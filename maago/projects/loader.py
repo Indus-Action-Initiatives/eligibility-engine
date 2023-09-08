@@ -58,7 +58,7 @@ class ProjectLoader:
         assert self.schemes != None
 
         orderedColumns = []
-        schemeBeneficiaries = {}
+        schemeBeneficiaries = []
         criteriaColumns = {}
         for scheme in self.schemes:
             auxilliaryColumns = self.__get_scheme_auxilliary_columns(scheme)
@@ -69,7 +69,9 @@ class ProjectLoader:
             orderedColumns = orderedColumnNames
             # Execute eligibility query
             schemeBeneficiariesDF = self.execute_custom_query(eligibilityQuery)
-            schemeBeneficiaries = df_to_dict(schemeBeneficiariesDF)
+            rows = df_to_dict(schemeBeneficiariesDF)
+            for r in rows:
+                schemeBeneficiaries.append(r)
         return schemeBeneficiaries, orderedColumns, criteriaColumns
 
     # # this method must be called only after the beneficiaries and the schemes are loaded
