@@ -49,11 +49,11 @@ class ProximityScoreCGRTEPlusJSONView:
         loader = CGRTEPlusLoader()
         loader.load_schemes()
         loader.load_beneficiaries(data["beneficiaries"])
-        rows, orderedColumns, criteriaColumns = loader.get_beneficiary_scheme_mapping()
-        schemeBeneficiaries = {}
-        populateProximityScores(
-            schemeBeneficiaries, rows, orderedColumns, criteriaColumns
-        )
+        schemeBeneficiaries = loader.get_beneficiary_scheme_mapping()
+        # schemeBeneficiaries = {}
+        # populateProximityScores(
+        #     schemeBeneficiaries, rows, orderedColumns, criteriaColumns
+        # )
         web.debug(schemeBeneficiaries)
         loader.cleanup()
         return json.dumps(schemeBeneficiaries)
@@ -69,11 +69,11 @@ class ProximityScoreBoCWJSONView:
         loader = BOCWLoader()
         loader.load_schemes()
         loader.load_beneficiaries(data["beneficiaries"])
-        rows, orderedColumns, criteriaColumns = loader.get_beneficiary_scheme_mapping()
-        schemeBeneficiaries = {}
-        populateProximityScores(
-            schemeBeneficiaries, rows, orderedColumns, criteriaColumns
-        )
+        schemeBeneficiaries = loader.get_beneficiary_scheme_mapping()
+        # schemeBeneficiaries = {}
+        # populateProximityScores(
+        #     schemeBeneficiaries, rows, orderedColumns, criteriaColumns
+        # )
         web.debug(schemeBeneficiaries)
         loader.cleanup()
         return json.dumps(schemeBeneficiaries)

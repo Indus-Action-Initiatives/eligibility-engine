@@ -1,6 +1,8 @@
 from abc import abstractmethod
 from app.db import execute_custom_query
 from loaders.beneficiary_scheme_mapping import get_criteria, df_to_dict
+from utils.proximity_score import populateProximityScores
+
 
 PROXIMITY_SCORE_KEY = "proximity_score"
 
@@ -58,7 +60,8 @@ class ProjectLoader:
         assert self.schemes != None
 
         orderedColumns = []
-        schemeBeneficiaries = []
+        schemeBeneficiariesRows = []
+        schemeBeneficiaries = {}
         criteriaColumns = {}
         for scheme in self.schemes:
             auxilliaryColumns = self.__get_scheme_auxilliary_columns(scheme)
@@ -71,8 +74,12 @@ class ProjectLoader:
             schemeBeneficiariesDF = self.execute_custom_query(eligibilityQuery)
             rows = df_to_dict(schemeBeneficiariesDF)
             for r in rows:
-                schemeBeneficiaries.append(r)
-        return schemeBeneficiaries, orderedColumns, criteriaColumns
+                schemeBeneficiariesRows.append(r)
+
+            populateProximityScores(
+                schemeBeneficiaries, rows, orderedColumns, criteriaColumns
+            )
+        return schemeBeneficiaries
 
     # # this method must be called only after the beneficiaries and the schemes are loaded
     # def populate_proximity_scores(self, criteriaColumns):

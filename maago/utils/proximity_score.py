@@ -58,9 +58,14 @@ def populateProximityScores(
         #     rowValues[c] = row[i]
         # TODO: Add fm.id, if not present
         if "f.id" not in rowValues.keys():
-            rowValues["f.id"] = "dummy"
-        beneficiaryKey = "%s__%s" % (rowValues["f.id"], rowValues["fm.id"])
+            rowValues["f.id"] = ""
+        beneficiaryKey = "%s%s" % (rowValues["f.id"], rowValues["fm.id"])
         schemeName = rowValues["scheme_name"]
+        schemeID = None
+        if "scheme_id" in rowValues.keys():
+            schemeID = rowValues["scheme_id"]
+        if not schemeID:
+            schemeID = schemeName
         beneficiary = {}
         if beneficiaryKey in schemeBeneficiaries:
             beneficiary = schemeBeneficiaries[beneficiaryKey]
@@ -70,12 +75,23 @@ def populateProximityScores(
             else:
                 # TODO: Add description of the criteria as well.
                 beneficiary["%s__%s" % (schemeName, key)] = row[key]
+        if "programEligibility" not in beneficiary.keys():
+            beneficiary["programEligibility"] = []
         if rowValues["main_criteria"] == 1:
-            beneficiary["%s__%s" % (schemeName, PROXIMITY_SCORE_KEY)] = 1
+            beneficiary["programEligibility"].append({
+                "programUuid": schemeID,
+                "proximityScore": 1,
+            })
+            beneficiary["%s__%s" % (schemeID, PROXIMITY_SCORE_KEY)] = 1
         else:
+            proximityScore = calculateProximityScore(rowValues, criteriaColumns)
+            beneficiary["programEligibility"].append({
+                "programUuid": schemeID,
+                "proximityScore": proximityScore,
+            })
             beneficiary[
                 "%s__%s" % (schemeName, PROXIMITY_SCORE_KEY)
-            ] = calculateProximityScore(rowValues, criteriaColumns)
+            ] = proximityScore
         schemeBeneficiaries[beneficiaryKey] = beneficiary
 
     return
