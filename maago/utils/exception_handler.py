@@ -1,8 +1,6 @@
 import functools
-import web
-import datetime;
+from middleware.logger import Log
 
-DEBUG = True
 
 def catch_exception(f):
     @functools.wraps(f)
@@ -10,11 +8,8 @@ def catch_exception(f):
         try:
             return f(*args, **kwargs)
         except Exception as e:
-            ct = datetime.datetime.now()
-            response = "{}: Caught an exception in {} : {}".format(ct, f.__qualname__, str(e))
+            response = Log.get_custom_error_message()
             print(response)
-            if DEBUG:
-                return web.debugerror()
             return response
             
     return func
