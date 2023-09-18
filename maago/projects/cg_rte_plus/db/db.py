@@ -1,8 +1,10 @@
 import duckdb
 import glob
 
+from utils.exception_handler import ErrorCatcher
 
-class CGRTEPlusSingletonDuckDB:
+
+class CGRTEPlusSingletonDuckDB(metaclass=ErrorCatcher):
     __instance = None
 
     @staticmethod
@@ -23,8 +25,8 @@ class CGRTEPlusSingletonDuckDB:
     @staticmethod
     def _migrate():
         instance = CGRTEPlusSingletonDuckDB.get_instance()
-        # os.listdir('maago/database')
-        sql_files = glob.glob("maago/projects/cg_rte_plus/db/migrations/*.sql")
+        # os.listdir('database')
+        sql_files = glob.glob("projects/cg_rte_plus/db/migrations/*.sql")
 
         sql_files.sort()
 
@@ -36,7 +38,7 @@ class CGRTEPlusSingletonDuckDB:
     @staticmethod
     def cleanup():
         instance = CGRTEPlusSingletonDuckDB.get_instance()
-        sql_files = glob.glob("maago/projects/cg_rte_plus/db/cleanup/*.sql")
+        sql_files = glob.glob("projects/cg_rte_plus/db/cleanup/*.sql")
 
         sql_files.sort()
 

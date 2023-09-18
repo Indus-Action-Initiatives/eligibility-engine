@@ -1,3 +1,4 @@
+from middleware.logger import Log
 import web
 import app.views
 from utils.proximity_score import InitGlobals
@@ -14,7 +15,9 @@ urls = (
     app.views.ProximityScoreBoCWJSONView,
 )
 
+app = web.application(urls, locals())
+wsgiapp = app.wsgifunc()
+
 if __name__ == "__main__":
     InitGlobals()
-    app = web.application(urls, locals())
-    app.run()
+    app.run(Log)

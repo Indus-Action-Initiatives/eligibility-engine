@@ -39,19 +39,19 @@ def PushBeneficiariesToDB(beneficiaries):
     global familyMembersMapping
     global pregnancyMapping
     familyMapping = getMappingFromCSVLoaderResponse(
-        CSVLoader("maago/config/familyMapping.csv")
+        CSVLoader("config/familyMapping.csv")
     )
     locationMapping = getMappingFromCSVLoaderResponse(
-        CSVLoader("maago/config/locationMapping.csv")
+        CSVLoader("config/locationMapping.csv")
     )
     respondentMapping = getMappingFromCSVLoaderResponse(
-        CSVLoader("maago/config/respondentMapping.csv")
+        CSVLoader("config/respondentMapping.csv")
     )
     familyMembersMapping = getMappingFromCSVLoaderResponse(
-        CSVLoader("maago/config/familyMembersMapping.csv")
+        CSVLoader("config/familyMembersMapping.csv")
     )
     pregnancyMapping = getMappingFromCSVLoaderResponse(
-        CSVLoader("maago/config/pregnancyMapping.csv")
+        CSVLoader("config/pregnancyMapping.csv")
     )
     families = []
     # For each beneficiary, create a structured (family) object out of it divided as family, respondent and family member data

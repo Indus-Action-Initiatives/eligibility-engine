@@ -23,8 +23,8 @@ class BoCWSingletonDuckDB:
     @staticmethod
     def _migrate():
         instance = BoCWSingletonDuckDB.get_instance()
-        # os.listdir('maago/database')
-        sql_files = glob.glob("maago/projects/bocw/db/migrations/*.sql")
+        # os.listdir('database')
+        sql_files = glob.glob("projects/bocw/db/migrations/*.sql")
 
         sql_files.sort()
 
@@ -36,7 +36,7 @@ class BoCWSingletonDuckDB:
     @staticmethod
     def cleanup():
         instance = BoCWSingletonDuckDB.get_instance()
-        sql_files = glob.glob("maago/projects/bocw/db/cleanup/*.sql")
+        sql_files = glob.glob("projects/bocw/db/cleanup/*.sql")
 
         sql_files.sort()
 

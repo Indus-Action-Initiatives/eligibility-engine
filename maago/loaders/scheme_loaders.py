@@ -11,7 +11,7 @@ IDiSchemeSubDiv = 'IDi scheme sub-divisions'
 # def LoadSchemes():
 #     schemes = []
 #     n = 0
-#     for scheme in CSVLoader('maago/config/benefitsCG.csv', numHeader=2):
+#     for scheme in CSVLoader('config/benefitsCG.csv', numHeader=2):
 #         n += 1
 #         if (scheme[State] == 'Chhattisgarh'
 #           and scheme[Sector] == 'Right to Livelihood'
@@ -35,7 +35,7 @@ IDiSchemeSubDiv = 'IDi scheme sub-divisions'
 
 
 def LoadSchemes() -> CSVLoader:
-    schemes = CSVLoader('maago/config/schemes.csv')
+    schemes = CSVLoader('config/schemes.csv')
     return schemes
 
 

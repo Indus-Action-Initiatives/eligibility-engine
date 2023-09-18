@@ -197,7 +197,7 @@ class CGRTEPlusLoader(ProjectLoader):
             self.__insert_family_member(member, familyID)
 
     def load_schemes(self):
-        schemes = CSVLoader("maago/projects/cg_rte_plus/config/schemes.csv")
+        schemes = CSVLoader("projects/cg_rte_plus/config/schemes.csv")
         self.schemes = schemes
 
     def load_beneficiaries(self, beneficiaries):
@@ -271,6 +271,6 @@ class CGRTEPlusLoader(ProjectLoader):
 
     def execute_custom_query(self, query):
         db = CGRTEPlusSingletonDuckDB.get_instance()
-        print(query + "\n\n")
+        # print(query + "\n\n")
         res = db.sql(query)
         return res.fetchdf()

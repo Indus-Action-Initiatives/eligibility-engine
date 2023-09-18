@@ -3,11 +3,12 @@ from app.db import execute_custom_query
 from loaders.beneficiary_scheme_mapping import get_criteria, df_to_dict
 from utils.proximity_score import populateProximityScores
 
+from utils.exception_handler import ErrorCatcher
 
 PROXIMITY_SCORE_KEY = "proximity_score"
 
 
-class ProjectLoader:
+class ProjectLoader(metaclass=ErrorCatcher):
     def __init__(self) -> None:
         self.beneficiaries = None
         self.schemes = None

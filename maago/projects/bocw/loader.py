@@ -53,7 +53,7 @@ class BOCWLoader(ProjectLoader):
         return memberID
 
     def load_schemes(self):
-        schemes = CSVLoader("maago/projects/bocw/config/schemes.csv")
+        schemes = CSVLoader("projects/bocw/config/schemes.csv")
         self.schemes = schemes
 
     def load_beneficiaries(self, beneficiaries):
@@ -115,6 +115,6 @@ class BOCWLoader(ProjectLoader):
 
     def execute_custom_query(self, query):
         db = BoCWSingletonDuckDB.get_instance()
-        print(query + "\n\n")
+        # print(query + "\n\n")
         res = db.sql(query)
         return res.fetchdf()

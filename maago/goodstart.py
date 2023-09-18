@@ -121,7 +121,7 @@ def getEntityForHeader(header):
 
 def main():
     InitGlobals()
-    LoadBeneficiariesFromFile('maago/data/survey_data_may.csv')
+    LoadBeneficiariesFromFile('data/survey_data_may.csv')
     beneficiarySchemes = GetBeneficiarySchemesMapping()    
     
     # get the schema

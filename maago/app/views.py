@@ -1,4 +1,6 @@
+import datetime
 import json
+from utils.exception_handler import ErrorCatcher
 from utils.proximity_score import populateProximityScores
 import web
 from app.db import get_all_schemes, insert_scheme
@@ -7,6 +9,7 @@ from projects.bocw.loader import BOCWLoader
 
 
 class SchemeListView:
+    __metaclass__ = ErrorCatcher
     def GET(self):
         schemes = get_all_schemes()
         return json.dumps(schemes)
@@ -18,6 +21,7 @@ class SchemeListView:
 
 
 class SchemeBulkAddView:
+    __metaclass__ = ErrorCatcher
     def POST(self):
         data = json.loads(web.data())
         for s in data:
@@ -39,41 +43,47 @@ class SchemeBulkAddView:
 #         return web.seeother('proximity_score/csv')
 
 
-class ProximityScoreCGRTEPlusJSONView:
+class ProximityScoreCGRTEPlusJSONView(metaclass=ErrorCatcher):
     def POST(self):
         data = json.loads(web.data())
         if not data:
-            jsonFile = open("maago/projects/cg_rte_plus/config/input.json")
+            jsonFile = open("projects/cg_rte_plus/config/input.json")
             data = json.load(jsonFile)
 
         loader = CGRTEPlusLoader()
         loader.load_schemes()
         loader.load_beneficiaries(data["beneficiaries"])
-        schemeBeneficiaries = loader.get_beneficiary_scheme_mapping()
-        # schemeBeneficiaries = {}
-        # populateProximityScores(
-        #     schemeBeneficiaries, rows, orderedColumns, criteriaColumns
-        # )
-        web.debug(schemeBeneficiaries)
+        rows, orderedColumns, criteriaColumns = loader.get_beneficiary_scheme_mapping()
+        schemeBeneficiaries = {}
+        populateProximityScores(
+            schemeBeneficiaries, rows, orderedColumns, criteriaColumns
+        )
+        # web.debug(schemeBeneficiaries)
         loader.cleanup()
+        ct = datetime.datetime.now()
+        response = "{}: 200 OK in ProximityScoreCGRTEPlusJSONView.POST".format(ct)
+        print(response)
         return json.dumps(schemeBeneficiaries)
 
 
-class ProximityScoreBoCWJSONView:
+class ProximityScoreBoCWJSONView(metaclass=ErrorCatcher):
     def POST(self):
         data = json.loads(web.data())
         if not data:
-            jsonFile = open("maago/projects/bocw/config/input.json")
+            jsonFile = open("projects/bocw/config/input.json")
             data = json.load(jsonFile)
 
         loader = BOCWLoader()
         loader.load_schemes()
         loader.load_beneficiaries(data["beneficiaries"])
-        schemeBeneficiaries = loader.get_beneficiary_scheme_mapping()
-        # schemeBeneficiaries = {}
-        # populateProximityScores(
-        #     schemeBeneficiaries, rows, orderedColumns, criteriaColumns
-        # )
-        web.debug(schemeBeneficiaries)
+        rows, orderedColumns, criteriaColumns = loader.get_beneficiary_scheme_mapping()
+        schemeBeneficiaries = {}
+        populateProximityScores(
+            schemeBeneficiaries, rows, orderedColumns, criteriaColumns
+        )
+        # web.debug(schemeBeneficiaries)
         loader.cleanup()
+        ct = datetime.datetime.now()
+        response = "{}: 200 OK in ProximityScoreBoCWJSONView.POST".format(ct)
+        print(response)
         return json.dumps(schemeBeneficiaries)

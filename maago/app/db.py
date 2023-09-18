@@ -1,6 +1,7 @@
 import duckdb
 import os
 import glob
+from utils.exception_handler import ErrorCatcher
 from utils.normalization import (
     get_normalised_date_value,
     get_normalised_bool_value,
@@ -10,7 +11,7 @@ from utils.normalization import (
 from utils.random import GetAlphaNumericString
 
 
-class SingletonDuckDB:
+class SingletonDuckDB(metaclass=ErrorCatcher):
     __instance = None
 
     @staticmethod
@@ -31,8 +32,8 @@ class SingletonDuckDB:
     # @staticmethod
     # def _migrate():
     #     instance = SingletonDuckDB.get_instance()
-    #     # os.listdir('maago/database')
-    #     sql_files = glob.glob("maago/database/migrations/*.sql")
+    #     # os.listdir('database')
+    #     sql_files = glob.glob("database/migrations/*.sql")
 
     #     sql_files.sort()
 
@@ -48,7 +49,7 @@ class SingletonDuckDB:
     @staticmethod
     def cleanup():
         instance = SingletonDuckDB.get_instance()
-        sql_files = glob.glob("maago/database/cleanup/*.sql")
+        sql_files = glob.glob("database/cleanup/*.sql")
 
         sql_files.sort()
 
@@ -196,6 +197,5 @@ def insert_family_member(member, familyID):
 
 def execute_custom_query(query):
     db = SingletonDuckDB.get_instance()
-    print(query + "\n\n")
     res = db.sql(query)
     return res.fetchdf()
