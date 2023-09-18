@@ -10,8 +10,11 @@ def catch_exception(f):
         except Exception as e:
             response = Log.get_custom_error_message()
             print(response)
+            if (hasattr(f, 'callback')):
+                f.callback()
+            else:
+                print('No callback in {}'.format(f.__name__))
             return response
-            
     return func
 
 class ErrorCatcher(type):

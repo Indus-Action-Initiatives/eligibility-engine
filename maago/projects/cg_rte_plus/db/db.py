@@ -1,3 +1,4 @@
+import datetime
 import duckdb
 import glob
 
@@ -46,3 +47,10 @@ class CGRTEPlusSingletonDuckDB(metaclass=ErrorCatcher):
             with open(file_path, "r") as file:
                 sql = file.read()
                 instance.execute(sql)
+
+    @staticmethod
+    def reset():
+        __class__.cleanup()
+        __class__._migrate()
+        ct = datetime.datetime.now()
+        print('\n{}: CGRTE DB reset\n\n'.format(ct))

@@ -274,3 +274,11 @@ class CGRTEPlusLoader(ProjectLoader):
         # print(query + "\n\n")
         res = db.sql(query)
         return res.fetchdf()
+    
+    def reset():
+        CGRTEPlusSingletonDuckDB.reset()
+
+    execute_custom_query.callback = reset
+    __insert_location.callback = reset
+    __insert_family.callback = reset
+    __insert_family_member.callback = reset

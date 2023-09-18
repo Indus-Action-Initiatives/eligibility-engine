@@ -1,8 +1,11 @@
+import datetime
 import duckdb
 import glob
 
+from utils.exception_handler import ErrorCatcher
 
-class BoCWSingletonDuckDB:
+
+class BoCWSingletonDuckDB(metaclass=ErrorCatcher):
     __instance = None
 
     @staticmethod
@@ -44,3 +47,10 @@ class BoCWSingletonDuckDB:
             with open(file_path, "r") as file:
                 sql = file.read()
                 instance.execute(sql)
+
+    @staticmethod
+    def reset():
+        __class__.cleanup()
+        __class__._migrate()
+        ct = datetime.datetime.now()
+        print('\n{}: BOCW DB reset\n\n'.format(ct))

@@ -118,3 +118,10 @@ class BOCWLoader(ProjectLoader):
         # print(query + "\n\n")
         res = db.sql(query)
         return res.fetchdf()
+    
+    def reset():
+        BoCWSingletonDuckDB.reset()
+    
+    execute_custom_query.callback = reset
+    __insert_beneficiary.callback = reset
+
