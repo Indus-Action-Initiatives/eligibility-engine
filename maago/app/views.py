@@ -72,6 +72,7 @@ class ProximityScoreCGRTEPlusJSONView(metaclass=ErrorCatcher):
         return json.dumps(schemeBeneficiaries)
     
     def OPTIONS(self):
+        ct = datetime.datetime.now()
         self.setHeaders()
         response = "{}: 200 OK in ProximityScoreCGRTEPlusJSONView.OPTIONS".format(ct)
         print(response)
@@ -108,6 +109,7 @@ class ProximityScoreBoCWJSONView(metaclass=ErrorCatcher):
         return json.dumps(schemeBeneficiaries)
     
     def OPTIONS(self):
+        ct = datetime.datetime.now()
         self.setHeaders()
         response = "{}: 200 OK in ProximityScoreCGRTEPlusJSONView.OPTIONS".format(ct)
         print(response)
