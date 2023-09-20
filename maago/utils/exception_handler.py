@@ -1,8 +1,10 @@
-import functools
+import functools, web
 from middleware.logger import Log
 
 
 def catch_exception(f):
+    # Temporary solution.
+    # Does not feel scalable.
     @functools.wraps(f)
     def func(*args, **kwargs):
         try:
@@ -14,7 +16,9 @@ def catch_exception(f):
                 f.callback()
             else:
                 print('No callback in {}'.format(f.__name__))
-            return response
+            if 'JSONDecodeError' == e.__class__.__name__:
+                return web.BadRequest(message=response)
+            return web.InternalError(message=response)
     return func
 
 class ErrorCatcher(type):
