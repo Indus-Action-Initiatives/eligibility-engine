@@ -44,6 +44,11 @@ class SchemeBulkAddView:
 
 
 class ProximityScoreCGRTEPlusJSONView(metaclass=ErrorCatcher):
+    def setHeaders(self):
+        # web.header('Content-Type', 'application/json')
+        web.header('Access-Control-Allow-Origin', '*')
+        web.header('Access-Control-Allow-Credentials', 'true')
+
     def POST(self):
         data = json.loads(web.data())
         if not data:
@@ -63,10 +68,23 @@ class ProximityScoreCGRTEPlusJSONView(metaclass=ErrorCatcher):
         ct = datetime.datetime.now()
         response = "{}: 200 OK in ProximityScoreCGRTEPlusJSONView.POST".format(ct)
         print(response)
+        self.setHeaders()
         return json.dumps(schemeBeneficiaries)
+    
+    def OPTIONS(self):
+        self.setHeaders()
+        response = "{}: 200 OK in ProximityScoreCGRTEPlusJSONView.OPTIONS".format(ct)
+        print(response)
+        return json.dumps({})
 
 
 class ProximityScoreBoCWJSONView(metaclass=ErrorCatcher):
+    def setHeaders(self):
+        # web.header('Content-Type', 'application/json')
+        web.header('Access-Control-Allow-Origin', '*')
+        web.header('Access-Control-Allow-Headers', '*')
+        web.header('Access-Control-Allow-Credentials', 'true')
+
     def POST(self):
         data = json.loads(web.data())
         if not data:
@@ -86,4 +104,11 @@ class ProximityScoreBoCWJSONView(metaclass=ErrorCatcher):
         ct = datetime.datetime.now()
         response = "{}: 200 OK in ProximityScoreBoCWJSONView.POST".format(ct)
         print(response)
+        self.setHeaders()
         return json.dumps(schemeBeneficiaries)
+    
+    def OPTIONS(self):
+        self.setHeaders()
+        response = "{}: 200 OK in ProximityScoreCGRTEPlusJSONView.OPTIONS".format(ct)
+        print(response)
+        return json.dumps({})
