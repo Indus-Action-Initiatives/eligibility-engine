@@ -27,6 +27,10 @@ class BOCWLoader(ProjectLoader):
     def __insert_beneficiary(self, member):
         db = BoCWSingletonDuckDB.get_instance()
         memberID = member["id"]
+        if "receiving_pension" not in member.keys():
+            member["receiving_pension"] = 'unknown'
+        if "receiving_government_aid" not in member.keys():
+            member["receiving_government_aid"] = 'unknown'
         query = """
             INSERT INTO family_members
             (id, age, gender, occupation, marital_status, pregnancy_status, bocw_card_registration_date, health_status, number_of_children, children_school_or_college, spouse_alive, occupation_of_surviving_spouse, receiving_pension, receiving_government_aid, home_ownership_status)
@@ -39,7 +43,7 @@ class BOCWLoader(ProjectLoader):
             get_normalised_string_value(member["occupation"]),
             get_normalised_string_value(member["marital_status"]),
             get_normalised_string_value(member["pregnancy_status"]),
-            get_normalised_date_value(member["bocw_card_registration_date"]),
+            get_normalised_date_value(member["bocw_card_registration_date"], "%Y-%m-%dT%H:%M:%S.%fZ"),
             get_normalised_string_value(member["health_status"]),
             member["number_of_children"],
             get_normalised_string_value(member["children_school_or_college"]),
