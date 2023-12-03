@@ -8,6 +8,7 @@ CREATE TABLE IF NOT EXISTS family_members (
     marital_status marital_status_enum,
     health_status health_status_enum,    
     number_of_children INT,
+    children_married marital_status_enum,
     children_school_or_college school_college_enum,
     spouse_alive bool_unk_enum,
     occupation_of_surviving_spouse VARCHAR(256),
