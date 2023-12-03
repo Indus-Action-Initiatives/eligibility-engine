@@ -91,6 +91,7 @@ class ProximityScoreBoCWJSONView(metaclass=ErrorCatcher):
         if not data:
             jsonFile = open("projects/bocw/config/input.json")
             data = json.load(jsonFile)
+        print(data)
 
         loader = BOCWLoader()
         loader.load_schemes()
@@ -106,6 +107,7 @@ class ProximityScoreBoCWJSONView(metaclass=ErrorCatcher):
         response = "{}: 200 OK in ProximityScoreBoCWJSONView.POST".format(ct)
         print(response)
         self.setHeaders()
+        print(schemeBeneficiaries)
         return json.dumps(schemeBeneficiaries)
     
     def OPTIONS(self):
