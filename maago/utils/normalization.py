@@ -20,7 +20,7 @@ def get_normalised_string_value(s):
 def get_normalised_bool_value(s):
     normalisedValue = UNKNOWN_STRING
 
-    truthValues = ["yes"]
+    truthValues = ["yes", True]
     falseValues = ["no"]
     if s in truthValues:
         normalisedValue = "true"

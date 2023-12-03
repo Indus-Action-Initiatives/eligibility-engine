@@ -1,5 +1,10 @@
 from datetime import datetime
 
+UNKNOWN_SCORE = 0.001
+UNKNOWN_STRING = "unknown"
+UNKNOWN_NUMBER = -19
+UNKNOWN_DATE = datetime.strptime("30-08-1857", "%d-%m-%Y")
+PROXIMITY_SCORE_KEY = "proximity_score"
 
 def InitGlobals():
     global UNKNOWN_SCORE

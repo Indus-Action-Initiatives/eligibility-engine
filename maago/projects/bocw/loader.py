@@ -54,6 +54,7 @@ class BOCWLoader(ProjectLoader):
             get_normalised_bool_value(member["receiving_government_aid"]),
             get_normalised_string_value(member["home_ownership_status"]),
         )
+        print(query)
         db.sql(query)
         return memberID
 
