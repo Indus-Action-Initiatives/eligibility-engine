@@ -1,6 +1,6 @@
 import mysql.connector
 from mysql.connector import Error
-
+from utils.logger import logger
 
 def GetDBConnection():
     # TODO: Make singleton?
@@ -12,8 +12,8 @@ def GetDBConnection():
     )
     try:
         if dbConnection.is_connected():
-            print("connected to the mysql db")
+            logger.info("connected to the mysql db")
     except Error as e:
-        print("error: ", e)
+        logger.error("error: ", e)
         return None
     return dbConnection

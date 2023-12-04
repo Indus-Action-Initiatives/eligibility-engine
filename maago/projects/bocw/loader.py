@@ -13,6 +13,7 @@ from utils.normalization import (
     get_normalised_string_value,
     get_normalised_float_value,
 )
+from utils.logger import logger
 
 config = get_config_mappings()
 
@@ -54,7 +55,7 @@ class BOCWLoader(ProjectLoader):
             get_normalised_bool_value(member["receiving_government_aid"]),
             get_normalised_string_value(member["home_ownership_status"]),
         )
-        print(query)
+        logger.info(query)
         db.sql(query)
         return memberID
 

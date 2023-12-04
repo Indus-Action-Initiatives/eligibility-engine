@@ -11,6 +11,7 @@ from utils.re_utils import (
     getColumnsFromCriterion,
     getOrderedColumnNamesFromTheSelectClause,
 )
+from utils.logger import logger
 import numpy as np
 import pdb
 
@@ -226,7 +227,7 @@ def GetBeneficiarySchemesMapping():
             schemeBeneficiaries, rows, orderedColumnNames, criteriaColumns
         )
 
-    print(schemeBeneficiaries)
+    logger.info(schemeBeneficiaries)
 
     cursor.close()
     dbConnection.close()
@@ -235,14 +236,14 @@ def GetBeneficiarySchemesMapping():
 
 
 def match(beneficiary, scheme):
-    print("chosen scheme: %s" % SchemeName(scheme))
-    print("criteria:")
+    logger.info("chosen scheme: %s" % SchemeName(scheme))
+    logger.info("criteria:")
     for k, v in scheme.items():
         if v.strip():
-            print("    %s = %s" % (normalizeString(k), normalizeString(v)))
-    print("beneficiary attributes (total %d):" % len(beneficiary))
+            logger.info("    %s = %s" % (normalizeString(k), normalizeString(v)))
+    logger.info("beneficiary attributes (total %d):" % len(beneficiary))
     for k, v in beneficiary.items():
-        print("        %s" % (normalizeString(k)))
+        logger.info("        %s" % (normalizeString(k)))
     for k, v in beneficiary.items():
         if v.strip():
-            print("    %s = %s" % (normalizeString(k), normalizeString(v)))
+            logger.info("    %s = %s" % (normalizeString(k), normalizeString(v)))
