@@ -1,5 +1,6 @@
 import functools, web
 from middleware.logger import Log
+from utils.logger import logger
 
 
 def catch_exception(f):
@@ -11,11 +12,11 @@ def catch_exception(f):
             return f(*args, **kwargs)
         except Exception as e:
             response = Log.get_custom_error_message()
-            print(response)
+            logger.error(response)
             if (hasattr(f, 'callback')):
                 f.callback()
             else:
-                print('No callback in {}'.format(f.__name__))
+                logger.error('No callback in {}'.format(f.__name__))
             if 'JSONDecodeError' == e.__class__.__name__:
                 return web.BadRequest(message=response)
             return web.InternalError(message=response)

@@ -1,5 +1,6 @@
 import sys, traceback, datetime
 from wsgilog import WsgiLog
+from utils.logger import logger
 
 log_file = 'log'
 
@@ -22,6 +23,6 @@ class Log(WsgiLog):
         err_type = type(exc_value).__name__
         err_msg = str(exc_value)
 
-        ct = datetime.datetime.now()
-        return "\n{}: Caught an exception {} in {}.{}[{}]: {}\nThe responsible code is: {}\n\n".format(ct, err_type, end.filename, end.name, end.lineno, err_msg, end.line)
+        message = "Caught an exception {} in {}.{}[{}]: {}\nThe responsible code is: {}".format(err_type, end.filename, end.name, end.lineno, err_msg, end.line)
+        logger.error(message)
 

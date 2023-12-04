@@ -8,6 +8,7 @@ from loaders.beneficiary_scheme_mapping import GetBeneficiarySchemesMapping
 from loaders.beneficiary_loaders import LoadBeneficiariesFromFile
 import csv
 from utils.proximity_score import InitGlobals
+from utils.logger import error
 
 entities = {
     "id": [],
@@ -136,7 +137,7 @@ def main():
                 for data in values:
                     writer.writerow(data)
         except IOError:
-            print("I/O error")
+            error("I/O error")
         
     return 0
 

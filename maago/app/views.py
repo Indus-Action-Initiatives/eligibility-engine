@@ -2,6 +2,7 @@ import datetime
 import json
 from utils.exception_handler import ErrorCatcher
 from utils.proximity_score import populateProximityScores
+from utils.logger import logger
 import web
 from app.db import get_all_schemes, insert_scheme
 from projects.cg_rte_plus.loader import CGRTEPlusLoader
@@ -65,19 +66,17 @@ class ProximityScoreCGRTEPlusJSONView(metaclass=ErrorCatcher):
         # )
         # web.debug(schemeBeneficiaries)
         loader.cleanup()
-        ct = datetime.datetime.now()
-        response = "{}: 200 OK in ProximityScoreCGRTEPlusJSONView.POST".format(ct)
-        print(response)
+        logger.info("cgrteplus request data: {}" % data)
+        response = json.dumps(schemeBeneficiaries)
+        logger.info(response)
+        logger.info("200 OK in ProximityScoreCGRTEPlusJSONView.POST")
         self.setHeaders()
-        return json.dumps(schemeBeneficiaries)
+        return json.dumps(response)
     
     def OPTIONS(self):
-        ct = datetime.datetime.now()
         self.setHeaders()
-        response = "{}: 200 OK in ProximityScoreCGRTEPlusJSONView.OPTIONS".format(ct)
-        print(response)
+        logger.info("200 OK in ProximityScoreCGRTEPlusJSONView.OPTIONS")
         return json.dumps({})
-
 
 class ProximityScoreBoCWJSONView(metaclass=ErrorCatcher):
     def setHeaders(self):
@@ -91,7 +90,6 @@ class ProximityScoreBoCWJSONView(metaclass=ErrorCatcher):
         if not data:
             jsonFile = open("projects/bocw/config/input.json")
             data = json.load(jsonFile)
-        print(data)
 
         loader = BOCWLoader()
         loader.load_schemes()
@@ -103,16 +101,14 @@ class ProximityScoreBoCWJSONView(metaclass=ErrorCatcher):
         # )
         # web.debug(schemeBeneficiaries)
         loader.cleanup()
-        ct = datetime.datetime.now()
-        response = "{}: 200 OK in ProximityScoreBoCWJSONView.POST".format(ct)
-        print(response)
+        logger.info("bocw request data: {}" % data)
+        response = json.dumps(schemeBeneficiaries)
+        logger.info(response)
+        logger.info("200 OK in ProximityScoreBOCWJSONView.POST")
         self.setHeaders()
-        print(schemeBeneficiaries)
-        return json.dumps(schemeBeneficiaries)
+        return json.dumps(response)
     
     def OPTIONS(self):
-        ct = datetime.datetime.now()
         self.setHeaders()
-        response = "{}: 200 OK in ProximityScoreCGRTEPlusJSONView.OPTIONS".format(ct)
-        print(response)
+        logger.info("200 OK in ProximityScoreCGRTEPlusJSONView.OPTIONS")        
         return json.dumps({})

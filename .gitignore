@@ -3,3 +3,6 @@
 .DS_Store
 maago/log*
 maago/**/node_modules/
+lib
+bin
+pyvenv.cfg
