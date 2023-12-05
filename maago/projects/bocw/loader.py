@@ -35,7 +35,7 @@ class BOCWLoader(ProjectLoader):
         query = """
             INSERT INTO family_members
             (id, age, gender, occupation, marital_status, pregnancy_status, bocw_card_registration_date, health_status, number_of_children, children_school_or_college, children_married, spouse_alive, occupation_of_surviving_spouse, receiving_pension, receiving_government_aid, home_ownership_status)
-            VALUES ('%s', %d, '%s', '%s', '%s', '%s', %s, '%s', %d, '%s', '%s', '%s', '%s', '%s', '%s')
+            VALUES ('%s', %d, '%s', '%s', '%s', '%s', %s, '%s', %d, '%s', '%s', '%s', '%s', '%s', '%s', '%s')
         """
         query = query % (
             memberID,
