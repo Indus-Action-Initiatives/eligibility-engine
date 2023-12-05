@@ -2,6 +2,7 @@
 **/__pycache__/
 .DS_Store
 maago/log*
+log*
 maago/**/node_modules/
 lib
 bin
