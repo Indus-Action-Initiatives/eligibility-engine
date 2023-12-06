@@ -37,10 +37,19 @@ class SingletonMySQLDB(metaclass=ErrorCatcher):
         return list(auth_keys_tuple)
     
     @staticmethod
+    def confirm_auth_table():
+        db = SingletonMySQLDB.get_instance()
+        create_clause = "CREATE TABLE IF NOT EXISTS auth_key (id VARCHAR(20) NOT NULL, tenant_id VARCHAR(20) NOT NULL, auth_key VARCHAR(20) NOT NULL, PRIMARY KEY (id), UNIQUE(tenant_id), UNIQUE(auth_key))"
+        cursor = db.cursor()
+        cursor.execute(create_clause)
+        db.commit()
+    
+    @staticmethod
     def add_key(tenant_id, auth_key):
+        db = SingletonMySQLDB.get_instance()
+        SingletonMySQLDB.confirm_auth_table()
         key_id = "K~{}".format(generate_token())
         insert_clause = "INSERT INTO auth_key VALUES ('{}', '{}', '{}')".format(key_id, tenant_id, auth_key)
-        db = SingletonMySQLDB.get_instance()
         cursor = db.cursor()
         cursor.execute(insert_clause)
         db.commit()
