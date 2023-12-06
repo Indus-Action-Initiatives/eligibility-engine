@@ -15,4 +15,4 @@ Run the following script:
 > python generate_api_key.py
 
 Save the API Key generated. Use it for api calls.
-There is no api timeout right now.
+There is no api key timeout right now.
