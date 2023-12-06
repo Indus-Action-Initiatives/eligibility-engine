@@ -23,5 +23,5 @@ class Log(WsgiLog):
         err_msg = str(exc_value)
 
         ct = datetime.datetime.now()
-        return "\n{}: Caught an exception {} in {}.{}[{}]: {}\nThe responsible code is: {}\n\n".format(ct, err_type, end.filename, end.name, end.lineno, err_msg, end.line)
+        return "{}: Caught an exception {} in {}.{}[{}]: {}. The responsible code is:\n\t{}".format(ct, err_type, end.filename, end.name, end.lineno, err_msg, end.line)
 

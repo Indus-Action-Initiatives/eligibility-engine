@@ -8,7 +8,6 @@ urls = (
     app.views.SchemeListView,
     "/schemes/bulk",
     app.views.SchemeBulkAddView,
-    # '/proximity_score/csv', app.views.ProximityScoreCSV,
     "/proximity_score/cg_rte_plus/json",
     app.views.ProximityScoreCGRTEPlusJSONView,
     "/proximity_score/bocw/json",
