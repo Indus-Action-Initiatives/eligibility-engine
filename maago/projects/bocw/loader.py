@@ -13,6 +13,7 @@ from utils.normalization import (
     get_normalised_string_value,
     get_normalised_float_value,
 )
+from utils.logger import logger
 
 config = get_config_mappings()
 
@@ -33,8 +34,8 @@ class BOCWLoader(ProjectLoader):
             member["receiving_government_aid"] = 'unknown'
         query = """
             INSERT INTO family_members
-            (id, age, gender, occupation, marital_status, pregnancy_status, bocw_card_registration_date, health_status, number_of_children, children_school_or_college, spouse_alive, occupation_of_surviving_spouse, receiving_pension, receiving_government_aid, home_ownership_status)
-            VALUES ('%s', %d, '%s', '%s', '%s', '%s', %s, '%s', %d, '%s', '%s', '%s', '%s', '%s', '%s')
+            (id, age, gender, occupation, marital_status, pregnancy_status, bocw_card_registration_date, health_status, number_of_children, children_school_or_college, children_married, spouse_alive, occupation_of_surviving_spouse, receiving_pension, receiving_government_aid, home_ownership_status)
+            VALUES ('%s', %d, '%s', '%s', '%s', '%s', %s, '%s', %d, '%s', '%s', '%s', '%s', '%s', '%s', '%s')
         """
         query = query % (
             memberID,
@@ -47,12 +48,14 @@ class BOCWLoader(ProjectLoader):
             get_normalised_string_value(member["health_status"]),
             member["number_of_children"],
             get_normalised_string_value(member["children_school_or_college"]),
+            get_normalised_string_value(member["children_married"]),
             get_normalised_bool_value(member["spouse_alive"]),
             get_normalised_string_value(member["occupation_of_surviving_spouse"]),
             get_normalised_bool_value(member["receiving_pension"]),
             get_normalised_bool_value(member["receiving_government_aid"]),
             get_normalised_string_value(member["home_ownership_status"]),
         )
+        logger.info(query)
         db.sql(query)
         return memberID
 
@@ -82,7 +85,7 @@ class BOCWLoader(ProjectLoader):
         selectClause = """SELECT \'%s\' as \'scheme_name\', \'%s\' as \'scheme_id\',
                 fm.id as \'fm.id\', fm.age as \'fm.age\', fm.gender as \'fm.gender\', fm.occupation as \'fm.occupation\', fm.marital_status as \'fm.marital_status\',
                 fm.pregnancy_status as \'fm.pregnancy_status\', fm.bocw_card_registration_date as \'fm.bocw_card_registration_date\', fm.health_status as \'fm.health_status\', fm.number_of_children as \'fm.number_of_children\',
-                fm.children_school_or_college as \'fm.children_school_or_college\', fm.spouse_alive as \'fm.spouse_alive\', fm.occupation_of_surviving_spouse as \'fm.occupation_of_surviving_spouse\',
+                fm.children_married as \'fm.children_married\', fm.children_school_or_college as \'fm.children_school_or_college\', fm.spouse_alive as \'fm.spouse_alive\', fm.occupation_of_surviving_spouse as \'fm.occupation_of_surviving_spouse\',
                 fm.receiving_pension as \'fm.receiving_pension\', fm.receiving_government_aid as \'fm.receiving_government_aid\', fm.home_ownership_status as \'fm.home_ownership_status\',
                 """ % (
             scheme["name"],

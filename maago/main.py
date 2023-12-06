@@ -2,6 +2,7 @@ from middleware.logger import Log
 import web
 import app.views
 from utils.proximity_score import InitGlobals
+from utils.logger import logger
 
 urls = (
     "/schemes",
@@ -20,3 +21,4 @@ wsgiapp = app.wsgifunc()
 if __name__ == "__main__":
     InitGlobals()
     app.run(Log)
+    logger.info("server started at port: 8080")

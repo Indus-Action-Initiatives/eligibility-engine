@@ -3,6 +3,7 @@ import duckdb
 import glob
 
 from utils.exception_handler import ErrorCatcher
+from utils.logger import logger
 
 
 class BoCWSingletonDuckDB(metaclass=ErrorCatcher):
@@ -53,4 +54,4 @@ class BoCWSingletonDuckDB(metaclass=ErrorCatcher):
         __class__.cleanup()
         __class__._migrate()
         ct = datetime.datetime.now()
-        print('\n{}: BOCW DB reset\n\n'.format(ct))
+        logger.info('\n{}: BOCW DB reset\n\n'.format(ct))

@@ -7,6 +7,7 @@ import json
 from app.perma_db import SingletonMySQLDB
 from utils.exception_handler import ErrorCatcher
 from utils.proximity_score import populateProximityScores
+from utils.logger import logger
 import web
 from app.db import get_all_schemes, insert_scheme
 from projects.cg_rte_plus.loader import CGRTEPlusLoader
@@ -44,24 +45,25 @@ class BaseView:
     def bad_response(self, code, message):
         """
         Generates the Error Response.
-        @TODO: Should be moved to somewhere accessible by ErrorCatcher.
         """
         switcher = {
             400: web.BadRequest(message=message),
             401: web.Unauthorized(message=message)
         }
+        logger.info(message)
         return switcher.get(code, web.BadRequest(message=message))
     
-    def good_response(self, data, f):
+    def good_response(self, response, f):
         """
         Creates a log entry.
         Sets headers and jsonify the data before returning.
         """
         ct = datetime.datetime.now()
-        response = "{}: 200 OK in {}".format(ct, f.__qualname__)
-        print(response)
+        message = "{}: 200 OK in {}".format(ct, f.__qualname__)
+        logger.info(response)
+        logger.info(message)
         self._set_headers()
-        return json.dumps(data)
+        return json.dumps(response)
     
     def OPTIONS(self):
         return self.good_response({}, self.OPTIONS)

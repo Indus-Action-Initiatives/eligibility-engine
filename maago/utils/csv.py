@@ -1,5 +1,6 @@
 import csv
 import sys
+from utils.logger import logger
 
 
 class SimpleCSVLoader:
@@ -9,7 +10,7 @@ class SimpleCSVLoader:
             f = open(filename, encoding='utf-8-sig')
             self.reader = csv.DictReader(f)
         except:
-            print('cannot load beneficiary file: %s' %
+            logger.error('cannot load beneficiary file: %s' %
                   filename, file=sys.stderr)
             raise
 
@@ -26,7 +27,7 @@ class CSVLoader:
             f = open(filename, encoding='utf-8-sig')
             reader = csv.reader(f)
         except:
-            print('cannot load CSV file: %s' % filename, file=sys.stderr)
+            logger.error('cannot load CSV file: %s' % filename, file=sys.stderr)
             raise
         for i in range(numHeader):
             headers.append(reader.__next__())

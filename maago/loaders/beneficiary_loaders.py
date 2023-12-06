@@ -11,6 +11,7 @@ from utils.normalization import (
 )
 from utils.random import GetAlphaNumericString
 from utils import proximity_score
+from utils.logger import logger
 
 from thefuzz import fuzz
 
@@ -21,7 +22,7 @@ def LoadBeneficiariesFromFile(dataFileName, loadToDB=True):
     beneficiaries = []
     for beneficiary in CSVLoader(dataFileName):
         beneficiaries.append(beneficiary)
-    print("%d beneficiaries" % len(beneficiaries))
+    logger.info("%d beneficiaries" % len(beneficiaries))
     if loadToDB:
         PushBeneficiariesToDB(beneficiaries)
     return beneficiaries
@@ -218,7 +219,7 @@ def load_family_to_db(family):
 
 def pushToDB(dbConnection, families):
     cursor = dbConnection.cursor()
-    print("starting to push %d families to db..." % len(families))
+    logger.info("starting to push %d families to db..." % len(families))
     for f in families:
         # TODO: Check if the location exists before inserting the location
         # Create location for the row, get the location ID
