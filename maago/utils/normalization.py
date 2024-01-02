@@ -10,7 +10,7 @@ PROXIMITY_SCORE_KEY = "proximity_score"
 
 def get_normalised_string_value(s):
     normalisedValue = UNKNOWN_STRING
-    if s != "":
+    if s not in ["", None]:
         normalisedValue = s
 
     return normalisedValue
@@ -31,7 +31,7 @@ def get_normalised_bool_value(s):
 
 def get_normalised_float_value(s):
     value = UNKNOWN_NUMBER
-    if s != "":
+    if s not in ["", None]:
         value = float(s)
 
     return value

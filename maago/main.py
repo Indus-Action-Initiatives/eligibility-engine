@@ -16,7 +16,7 @@ urls = (
 )
 
 app = web.application(urls, locals())
-wsgiapp = app.wsgifunc()
+wsgiapp = app.wsgifunc(Log)
 
 if __name__ == "__main__":
     InitGlobals()
