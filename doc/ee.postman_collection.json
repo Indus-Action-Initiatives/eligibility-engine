@@ -1,0 +1,171 @@
+{
+	"info": {
+		"_postman_id": "d55e75fd-23fe-456f-b617-98270c83d077",
+		"name": "Eligibility Engine",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "31578773"
+	},
+	"item": [
+		{
+			"name": "bocw_maternity_benefit",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"beneficiaries\": [\n    {\n      \"id\": \"6457727c0fb1a5001bf1ee4f\",\n      \"age\": 21,\n      \"gender\": \"female\",\n      \"occupation\": \"Construction worker\",\n      \"marital_status\": \"Married\",\n      \"pregnancy_status\": \"Delivered first child\",\n      \"bocw_card_registration_date\": \"1986-01-01T00:00:00.000Z\",\n      \"health_status\": \"Deceased\",\n      \"number_of_children\": 1,\n      \"children_school_or_college\": \"School\",\n      \"children_married\": \"Married\",\n      \"spouse_alive\": true,\n      \"occupation_of_surviving_spouse\": \"teacher\",\n      \"receiving_pension\": true,\n      \"receiving_government_aid\": true,\n      \"home_ownership_status\": \"Home Owner\"\n    },\n    {\n      \"id\": \"6457727c0fb1a5001bf1eef4\",\n      \"age\": 21,\n      \"gender\": \"female\",\n      \"occupation\": \"Construction worker\",\n      \"marital_status\": \"Married\",\n      \"pregnancy_status\": \"Pregnant\",\n      \"bocw_card_registration_date\": \"1986-01-01T00:00:00.0000Z\",\n      \"health_status\": \"Deceased\",\n      \"number_of_children\": 1,\n      \"children_school_or_college\": \"School\",\n      \"children_married\": \"Married\",\n      \"spouse_alive\": true,\n      \"occupation_of_surviving_spouse\": \"teacher\",\n      \"receiving_pension\": true,\n      \"receiving_government_aid\": true,\n      \"home_ownership_status\": \"Home Owner\"\n    }\n  ]\n}\n"
+				},
+				"url": {
+					"raw": "{{host}}/proximity_score/bocw/json",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"proximity_score",
+						"bocw",
+						"json"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "bocw_miscarriage",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"beneficiaries\": [\n    {\n      \"id\": \"6457727c0fb1a5001bf1ee4f\",\n      \"age\": 21,\n      \"gender\": \"female\",\n      \"occupation\": \"Construction worker\",\n      \"marital_status\": \"Married\",\n      \"pregnancy_status\": \"Miscarriage/ Still born\",\n      \"bocw_card_registration_date\": \"1986-01-01T00:00:00.000Z\",\n      \"health_status\": \"Deceased\",\n      \"children_school_or_college\": \"School\",\n      \"children_married\": \"Married\",\n      \"spouse_alive\": true,\n      \"occupation_of_surviving_spouse\": \"teacher\",\n      \"receiving_pension\": true,\n      \"receiving_government_aid\": true,\n      \"home_ownership_status\": \"Home Owner\"\n    },\n    {\n      \"id\": \"6457727c0fb1a5001bf1eef4\",\n      \"age\": 21,\n      \"gender\": \"female\",\n      \"occupation\": \"Construction worker\",\n      \"marital_status\": \"Married\",\n      \"pregnancy_status\": \"Pregnant\",\n      \"bocw_card_registration_date\": \"1986-01-01T00:00:00.0000Z\",\n      \"health_status\": \"Deceased\",\n      \"number_of_children\": 1,\n      \"children_school_or_college\": \"School\",\n      \"children_married\": \"Married\",\n      \"spouse_alive\": true,\n      \"occupation_of_surviving_spouse\": \"teacher\",\n      \"receiving_pension\": true,\n      \"receiving_government_aid\": true,\n      \"home_ownership_status\": \"Home Owner\"\n    }\n  ]\n}\n"
+				},
+				"url": {
+					"raw": "{{host}}/proximity_score/bocw/json",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"proximity_score",
+						"bocw",
+						"json"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "bocw_medical_assistance",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"beneficiaries\": [\n    {\n      \"id\": \"6457727c0fb1a5001bf1ee4f\",\n      \"age\": 21,\n      \"gender\": \"female\",\n      \"occupation\": \"Construction worker\",\n      \"marital_status\": \"Married\",\n      \"pregnancy_status\": \"Delivered first child\",\n      \"bocw_card_registration_date\": \"1986-01-01T00:00:00.000Z\",\n      \"health_status\": \"Hospitalised for more than 5 days\",\n      \"number_of_children\": 1,\n      \"children_school_or_college\": \"School\",\n      \"children_married\": \"Married\",\n      \"spouse_alive\": true,\n      \"occupation_of_surviving_spouse\": \"teacher\",\n      \"receiving_pension\": true,\n      \"receiving_government_aid\": true,\n      \"home_ownership_status\": \"Home Owner\"\n    },\n    {\n      \"id\": \"6457727c0fb1a5001bf1e44f\",\n      \"age\": 21,\n      \"gender\": \"female\",\n      \"occupation\": \"Construction worker\",\n      \"marital_status\": \"Married\",\n      \"pregnancy_status\": \"Delivered first child\",\n      \"bocw_card_registration_date\": \"1986-01-01T00:00:00.000Z\",\n      \"health_status\": \"In plaster at residence\",\n      \"number_of_children\": 1,\n      \"children_school_or_college\": \"School\",\n      \"children_married\": \"Married\",\n      \"spouse_alive\": true,\n      \"occupation_of_surviving_spouse\": \"teacher\",\n      \"receiving_pension\": true,\n      \"receiving_government_aid\": true,\n      \"home_ownership_status\": \"Home Owner\"\n    },\n    {\n      \"id\": \"6457727c0fb1a5001bf1eef4\",\n      \"age\": 21,\n      \"gender\": \"female\",\n      \"occupation\": \"Construction worker\",\n      \"marital_status\": \"Married\",\n      \"pregnancy_status\": \"Pregnant\",\n      \"bocw_card_registration_date\": \"1986-01-01T00:00:00.0000Z\",\n      \"health_status\": \"Deceased\",\n      \"number_of_children\": 1,\n      \"children_school_or_college\": \"School\",\n      \"children_married\": \"Married\",\n      \"spouse_alive\": true,\n      \"occupation_of_surviving_spouse\": \"teacher\",\n      \"receiving_pension\": true,\n      \"receiving_government_aid\": true,\n      \"home_ownership_status\": \"Home Owner\"\n    }\n  ]\n}\n"
+				},
+				"url": {
+					"raw": "{{host}}/proximity_score/bocw/json",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"proximity_score",
+						"bocw",
+						"json"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "bocw_eudcation_assistance",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"beneficiaries\": [\n    {\n      \"id\": \"6457727c0fb1a5001bf1ee4f\",\n      \"age\": 21,\n      \"gender\": \"female\",\n      \"occupation\": \"Construction worker\",\n      \"marital_status\": \"Married\",\n      \"pregnancy_status\": \"Delivered first child\",\n      \"bocw_card_registration_date\": \"1986-01-01T00:00:00.000Z\",\n      \"health_status\": \"Hospitalised for more than 5 days\",\n      \"number_of_children\": 1,\n      \"children_school_or_college\": \"School\",\n      \"children_married\": \"Married\",\n      \"spouse_alive\": true,\n      \"occupation_of_surviving_spouse\": \"teacher\",\n      \"receiving_pension\": true,\n      \"receiving_government_aid\": true,\n      \"home_ownership_status\": \"Home Owner\"\n    },\n    {\n      \"id\": \"6457727c0fb1a5001bf4ee4f\",\n      \"age\": 21,\n      \"gender\": \"female\",\n      \"occupation\": \"Construction worker\",\n      \"marital_status\": \"Married\",\n      \"pregnancy_status\": \"Delivered first child\",\n      \"bocw_card_registration_date\": \"1986-01-01T00:00:00.000Z\",\n      \"health_status\": \"In plaster at residence\",\n      \"number_of_children\": 1,\n      \"children_school_or_college\": \"College\",\n      \"children_married\": \"Married\",\n      \"spouse_alive\": true,\n      \"occupation_of_surviving_spouse\": \"teacher\",\n      \"receiving_pension\": true,\n      \"receiving_government_aid\": true,\n      \"home_ownership_status\": \"Home Owner\"\n    },\n    {\n      \"id\": \"6457727c0fb1a5001bf1eef4\",\n      \"age\": 21,\n      \"gender\": \"female\",\n      \"occupation\": \"Construction worker\",\n      \"marital_status\": \"Married\",\n      \"pregnancy_status\": \"Pregnant\",\n      \"bocw_card_registration_date\": \"1986-01-01T00:00:00.0000Z\",\n      \"health_status\": \"Deceased\",\n      \"number_of_children\": 1,\n      \"children_school_or_college\": \"School\",\n      \"children_married\": \"Married\",\n      \"spouse_alive\": true,\n      \"occupation_of_surviving_spouse\": \"teacher\",\n      \"receiving_pension\": true,\n      \"receiving_government_aid\": true,\n      \"home_ownership_status\": \"Home Owner\"\n    }\n  ]\n}\n"
+				},
+				"url": {
+					"raw": "{{host}}/proximity_score/bocw/json",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"proximity_score",
+						"bocw",
+						"json"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "bocw_old_age_pension",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"beneficiaries\": [\n    {\n      \"id\": \"6457727c0fb1a5001bf1ee4f\",\n      \"age\": 61,\n      \"gender\": \"female\",\n      \"occupation\": \"Construction worker\",\n      \"marital_status\": \"Married\",\n      \"pregnancy_status\": \"Delivered first child\",\n      \"bocw_card_registration_date\": \"1986-01-01T00:00:00.000Z\",\n      \"health_status\": \"Hospitalised for more than 5 days\",\n      \"number_of_children\": 1,\n      \"children_school_or_college\": \"School\",\n      \"children_married\": \"Married\",\n      \"spouse_alive\": true,\n      \"occupation_of_surviving_spouse\": \"teacher\",\n      \"receiving_pension\": true,\n      \"receiving_government_aid\": true,\n      \"home_ownership_status\": \"Home Owner\"\n    },\n    {\n      \"id\": \"6457727c0fb1a5001bf4ee4f\",\n      \"age\": 21,\n      \"gender\": \"female\",\n      \"occupation\": \"Construction worker\",\n      \"marital_status\": \"Married\",\n      \"pregnancy_status\": \"Delivered first child\",\n      \"bocw_card_registration_date\": \"1986-01-01T00:00:00.000Z\",\n      \"health_status\": \"In plaster at residence\",\n      \"number_of_children\": 1,\n      \"children_school_or_college\": \"College\",\n      \"children_married\": \"Married\",\n      \"spouse_alive\": true,\n      \"occupation_of_surviving_spouse\": \"teacher\",\n      \"receiving_pension\": true,\n      \"receiving_government_aid\": true,\n      \"home_ownership_status\": \"Home Owner\"\n    }\n  ]\n}\n"
+				},
+				"url": {
+					"raw": "{{host}}/proximity_score/bocw/json",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"proximity_score",
+						"bocw",
+						"json"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "bocw_disability",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"beneficiaries\": [\n    {\n      \"id\": \"6457727c0fb1a5001bf1ee4f\",\n      \"age\": 61,\n      \"gender\": \"female\",\n      \"occupation\": \"Construction worker\",\n      \"marital_status\": \"Married\",\n      \"pregnancy_status\": \"Delivered first child\",\n      \"bocw_card_registration_date\": \"1986-01-01T00:00:00.000Z\",\n      \"health_status\": \"Permanent disability as per disability certificate\",\n      \"number_of_children\": 1,\n      \"children_school_or_college\": \"School\",\n      \"children_married\": \"Married\",\n      \"spouse_alive\": true,\n      \"occupation_of_surviving_spouse\": \"teacher\",\n      \"receiving_pension\": true,\n      \"receiving_government_aid\": true,\n      \"home_ownership_status\": \"Home Owner\"\n    },\n    {\n      \"id\": \"6457727c0fb1a5001bf4ee4f\",\n      \"age\": 21,\n      \"gender\": \"female\",\n      \"occupation\": \"Construction worker\",\n      \"marital_status\": \"Married\",\n      \"pregnancy_status\": \"Delivered first child\",\n      \"bocw_card_registration_date\": \"1986-01-01T00:00:00.000Z\",\n      \"health_status\": \"In plaster at residence\",\n      \"number_of_children\": 1,\n      \"children_school_or_college\": \"College\",\n      \"children_married\": \"Married\",\n      \"spouse_alive\": true,\n      \"occupation_of_surviving_spouse\": \"teacher\",\n      \"receiving_pension\": true,\n      \"receiving_government_aid\": true,\n      \"home_ownership_status\": \"Home Owner\"\n    }\n  ]\n}\n"
+				},
+				"url": {
+					"raw": "{{host}}/proximity_score/bocw/json",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"proximity_score",
+						"bocw",
+						"json"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "bocw_family_pension",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"beneficiaries\": [\n    {\n      \"id\": \"6457727c0fb1a5001bf1ee4f\",\n      \"age\": 61,\n      \"gender\": \"female\",\n      \"occupation\": \"Construction worker\",\n      \"marital_status\": \"Married\",\n      \"pregnancy_status\": \"Delivered first child\",\n      \"bocw_card_registration_date\": \"1986-01-01T00:00:00.000Z\",\n      \"health_status\": \"Deceased\",\n      \"number_of_children\": 1,\n      \"children_school_or_college\": \"School\",\n      \"children_married\": \"Married\",\n      \"spouse_alive\": true,\n      \"occupation_of_surviving_spouse\": \"Pensioner\",\n      \"receiving_pension\": true,\n      \"receiving_government_aid\": true,\n      \"home_ownership_status\": \"Home Owner\"\n    },\n    {\n      \"id\": \"6457727c0fb1a5001bf4ee4f\",\n      \"age\": 21,\n      \"gender\": \"female\",\n      \"occupation\": \"Construction worker\",\n      \"marital_status\": \"Married\",\n      \"pregnancy_status\": \"Delivered first child\",\n      \"bocw_card_registration_date\": \"1986-01-01T00:00:00.000Z\",\n      \"health_status\": \"In plaster at residence\",\n      \"number_of_children\": 1,\n      \"children_school_or_college\": \"College\",\n      \"children_married\": \"Married\",\n      \"spouse_alive\": true,\n      \"occupation_of_surviving_spouse\": \"teacher\",\n      \"receiving_pension\": true,\n      \"receiving_government_aid\": true,\n      \"home_ownership_status\": \"Home Owner\"\n    }\n  ]\n}\n"
+				},
+				"url": {
+					"raw": "{{host}}/proximity_score/bocw/json",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"proximity_score",
+						"bocw",
+						"json"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

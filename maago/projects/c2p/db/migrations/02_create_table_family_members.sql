@@ -1,0 +1,22 @@
+CREATE TABLE IF NOT EXISTS family_members (
+    id VARCHAR(8),
+    family_id VARCHAR(32),
+    name VARCHAR(128),
+    dob DATE NULL DEFAULT NULL,
+    gender gen_enum,
+    occupation VARCHAR(256),
+    labour_card_status labour_card_status_enum,
+    renewal_date DATE NULL DEFAULT NULL,
+    marital_status marital_status_enum,
+    wife_or_cw_pregnant bool_unk_enum,
+    pregnancy_status pregnancy_status_enum,
+    have_children bool_unk_enum,
+    children_school VARCHAR(128),
+    children_college VARCHAR(128),
+    received_benefits VARCHAR[],
+    last_child_270_days VARCHAR(128),
+    dsw VARCHAR[],
+    class VARCHAR(128),
+    PRIMARY KEY (id),
+    FOREIGN KEY (family_id) REFERENCES families(id)
+);

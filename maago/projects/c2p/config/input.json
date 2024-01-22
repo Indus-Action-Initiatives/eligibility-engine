@@ -1,0 +1,102 @@
+{
+  "beneficiaries": [
+    {
+      "family_annual_income": 40000,
+      "family_any_construction_worker": true,
+      "family_any_pregnant_women": true,
+      "family_any_children_3_9": true,
+      "construction_worker_1_id": "unique_id1",
+      "construction_worker_1_name": "amitabh",
+      "construction_worker_1_dob": "1989-11-02T00:00:00.000Z",
+      "consturction_worker_1_occupation": "cement mixer",
+      "construction_worker_1_labour_card_status": "valid",
+      "construction_worker_1_renewal_date": "2023-12-31T00:00:00.000Z",
+      "construction_worker_1_marital_status": "married",
+      "construction_worker_1_pregnant": true,
+      "construction_worker_1_pregnancy_status": "8_months",
+      "construction_worker_1_have_children": true,
+      "construction_worker_1_children_school": "class_6_8",
+      "construction_worker_1_children_college": "llb",
+      "construction_worker_1_received_benefits": [
+        "widow pension",
+        "disability pension"
+      ],
+      "pregnant_woman_1_id": "unique_id2",
+      "pregnant_woman_1_name": "jaya",
+      "pregnant_woman_1_dob": "1989-11-02T00:00:00.000Z",
+      "pregnant_woman_1_status": "pregnant",
+      "pregnant_woman_1_last_child_270_days": true,
+      "pregnant_woman_1_disadvantged": ["sc_st"],
+      "pregnant_woman_1_received_benefits": [
+        "widow pension",
+        "disability pension"
+      ],
+      "children_1_id": "unique_id1",
+      "children_1_name": "abhishek",
+      "children_1_dob": "1994-02-05T00:00:00.000Z",
+      "children_1_gender": "male",
+      "children_1_disadvantaged": ["sc_st"],
+      "children_1_class": "class_1",
+      "documents_mnrega": true,
+      "documents_eshram": true,
+      "documents_ayushman": true,
+      "documents_mcp_card": true,
+      "documents_medical_certificate": true,
+      "documents_ration_card": true,
+      "documents_ration_card_type": "yellow",
+      "documents_bocw_card": true
+    }
+  ],
+  "beneficiaries_1": [
+    {
+      "household": {
+        "id": "unique_id0",
+        "annual_income": 40000,
+        "any_construction_worker": true,
+        "any_pregnant_women": true,
+        "any_children_3_9": true
+      },
+      "bocw": [
+        {
+          "id": "unique_id1",
+          "household_id": "unique_id0",
+          "name": "amitabh",
+          "dob": "1989-11-02T00:00:00.000Z",
+          "occupation": "cement mixer",
+          "labour_card_status": "valid",
+          "renewal_date": "2023-12-31T00:00:00.000Z",
+          "marital_status": "married",
+          "pregnant": true,
+          "pregnancy_status": "8_months",
+          "have_children": true,
+          "children_school": "class_6_8",
+          "children_college": "llb",
+          "received_benefits": ["widow pension", "disability pension"]
+        }
+      ],
+      "pmmvy": [
+        {
+          "id": "unique_id2",
+          "household_id": "unique_id0",
+          "name": "jaya",
+          "dob": "1989-11-02T00:00:00.000Z",
+          "status": "pregnant",
+          "last_child_270_days": "less than 270 days",
+          "dsw": ["sc_st"],
+          "received_benefits": ["widow pension", "disability pension"]
+        }
+      ],
+      "rte": [
+        {
+          "id": "unique_id3",
+          "household_id": "unique_id0",
+          "name": "abhishek",
+          "dob": "1989-11-02T00:00:00.000Z",
+          "gender": "male",
+          "dsw": ["sc_st"],
+          "class": "class_1"
+        }
+      ]
+    }
+  ]
+}
