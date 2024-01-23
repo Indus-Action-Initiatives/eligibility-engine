@@ -12,6 +12,7 @@ import web
 from app.db import get_all_schemes, insert_scheme
 from projects.cg_rte_plus.loader import CGRTEPlusLoader
 from projects.bocw.loader import BOCWLoader
+from projects.c2p.loader import C2PLoader
 
 
 class BaseView:
@@ -156,3 +157,24 @@ class ProximityScoreBoCWJSONView(BaseView):
         loader.cleanup()
         return self.good_response(schemeBeneficiaries, self.POST)
 
+
+class ProximityScoreC2PJSONView(BaseView):
+    """
+    Handles proximity score for C2P
+    """
+    def POST(self):
+        """
+        Process POST requests on 'proximity_score/c2p/json' route
+        """
+        if (not self.check_key('')):
+            return self.bad_response(401, "Invalid Key")
+        data = json.loads(web.data())
+        if not data:
+            jsonFile = open("projects/c2p/config/input.json")
+            data = json.loads(jsonFile)
+        loader = C2PLoader()
+        loader.load_schemes()
+        loader.load_beneficiaries(data["beneficiaries"])
+        schemeBeneficiaries = loader.get_beneficiary_scheme_mapping()
+        loader.cleanup()
+        return self.good_response(schemeBeneficiaries, self.POST)

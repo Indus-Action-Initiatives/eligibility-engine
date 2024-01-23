@@ -40,7 +40,7 @@ def get_normalised_float_value(s):
 # GetDBDateString converts a date string into YYYY-mm-dd formatted string
 def get_normalised_date_value(d, f="%d-%m-%Y"):
     value = "'" + str(UNKNOWN_DATE) + "'"
-    if d != "":
+    if d != "" and d is not None:
         dateObject = datetime.strptime(d, f)
         value = "'" + dateObject.strftime("%Y-%m-%d") + "'"
     return value

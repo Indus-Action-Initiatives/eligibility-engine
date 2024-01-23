@@ -13,6 +13,8 @@ urls = (
     app.views.ProximityScoreCGRTEPlusJSONView,
     "/proximity_score/bocw/json",
     app.views.ProximityScoreBoCWJSONView,
+    "/proximity_score/c2p/json",
+    app.views.ProximityScoreC2PJSONView,
 )
 
 app = web.application(urls, locals())

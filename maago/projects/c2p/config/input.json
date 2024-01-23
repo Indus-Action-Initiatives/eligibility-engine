@@ -1,0 +1,55 @@
+{
+  "beneficiaries": [
+    {
+      "household": {
+        "id": "unique_id0",
+        "annual_income": 40000,
+        "any_construction_worker": true,
+        "any_pregnant_women": true,
+        "any_children_3_9": true,
+        "place_of_residence": "Delhi"
+      },
+      "bocw": [
+        {
+          "id": "unique_id1",
+          "family_id": "unique_id0",
+          "name": "amitabh",
+          "dob": "1989-11-02T00:00:00.000Z",
+          "occupation": "cement mixer",
+          "labour_card_status": "Available",
+          "renewal_date": "2023-12-31T00:00:00.000Z",
+          "marital_status": "Married",
+          "pregnant": true,
+          "pregnancy_status": "Pregnant",
+          "have_children": true,
+          "children_school": "class_6_8",
+          "children_college": "llb",
+          "received_benefits": ["widow pension", "disability pension"]
+        }
+      ],
+      "pmmvy": [
+        {
+          "id": "unique_id2",
+          "family_id": "unique_id0",
+          "name": "jaya",
+          "dob": "1989-11-02T00:00:00.000Z",
+          "status": "pregnant",
+          "last_child_270_days": "less than 270 days",
+          "dsw": ["sc_st"],
+          "received_benefits": ["widow pension", "disability pension"]
+        }
+      ],
+      "rte": [
+        {
+          "id": "unique_id3",
+          "family_id": "unique_id0",
+          "name": "abhishek",
+          "dob": "1989-11-02T00:00:00.000Z",
+          "gender": "male",
+          "dsw": ["sc_st"],
+          "class": "Nursery"
+        }
+      ]
+    }
+  ]
+}
