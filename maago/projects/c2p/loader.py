@@ -49,7 +49,7 @@ class C2PLoader(ProjectLoader):
         else:
             return obj[key]
         
-    def __get_list_values_string(values):
+    def __get_list_values_string(self, values):
         ret_val = "list_value("
         if values is None:
             ret_val = ret_val + ")"
@@ -91,18 +91,16 @@ class C2PLoader(ProjectLoader):
             (id, family_id, name, dob, occupation, labour_card_status, renewal_date, marital_status, wife_or_cw_pregnant,
             pregnancy_status, have_children, children_school, children_college, received_benefits, last_child_270_days,
             dsw, gender, class)
-            VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', %s, '%s', %s, '%s', '%s')
+            VALUES ('%s', '%s', '%s', %s, '%s', '%s', %s, '%s', '%s', '%s', '%s', '%s', '%s', %s, '%s', %s, '%s', '%s')
         """
-        db.sql(
-            query
-            % (
+        db.sql(query % (
                 id,
                 family_id,
                 name,
-                get_normalised_date_value(dob),
+                get_normalised_date_value(dob, "%Y-%m-%dT%H:%M:%S.%fZ"),
                 get_normalised_string_value(occupation),
                 get_normalised_string_value(labour_card_status),
-                get_normalised_date_value(renewal_date),
+                get_normalised_date_value(renewal_date, "%Y-%m-%dT%H:%M:%S.%fZ"),
                 get_normalised_string_value(marital_status),
                 get_normalised_bool_value(wife_or_cw_pregnant),
                 get_normalised_string_value(pregnancy_status),
@@ -116,7 +114,6 @@ class C2PLoader(ProjectLoader):
                 get_normalised_string_value(child_class)
             )
         )
-
         return id
 
     def __load_beneficiary_to_db(self, beneficiary):
@@ -155,15 +152,15 @@ class C2PLoader(ProjectLoader):
         # TODO: This is ugly, bad, nasty. Need to do a better job with this.
         # construct select clause
         selectClause = """SELECT \'%s\' as \'scheme_name\',
-                f.id as \'f.id\', f.por as \'f.por'\, f.annual_income as \'f.annual_income'\,
+                f.id as \'f.id\', f.por as \'f.por\', f.annual_income as \'f.annual_income\',
                 fm.id as \'fm.id\', fm.name as \'fm.name\', fm.dob as \'fm.dob\', fm.gender as \'fm.gender\',
-                fm.occupation as \'fm.occupation'\, fm.labour_card_status as \'fm.labour_card_status'\,
-                fm.renewal_date as \'fm.renewal_date'\, fm.marital_status as \'fm.marital_status'\,
-                fm.wife_or_cw_pregnant as \'fm.wife_or_cw_pregnant'\, fm.pregnancy_status as \'fm.pregnancy_status'\,
-                fm.have_children as \'fm.have_children'\, fm.children_school as \'fm.children_school'\,
-                fm.children_college as \'fm.children_college'\, fm.received_benenfits as \'fm.received_benefits'\,
-                fm.last_child_270_days as \'fm.last_child_270_days'\, fm.dsw as \'fm.dsw'\,
-                fm.class as \'fm.class'\,
+                fm.occupation as \'fm.occupation\', fm.labour_card_status as \'fm.labour_card_status\',
+                fm.renewal_date as \'fm.renewal_date\', fm.marital_status as \'fm.marital_status\',
+                fm.wife_or_cw_pregnant as \'fm.wife_or_cw_pregnant\', fm.pregnancy_status as \'fm.pregnancy_status\',
+                fm.have_children as \'fm.have_children\', fm.children_school as \'fm.children_school\',
+                fm.children_college as \'fm.children_college\', fm.received_benefits as \'fm.received_benefits\',
+                fm.last_child_270_days as \'fm.last_child_270_days\', fm.dsw as \'fm.dsw\',
+                fm.class as \'fm.class\',
                 """ % scheme[
             "name"
         ]

@@ -58,6 +58,8 @@ def df_to_dict(df):
         df["fm.bocw_card_registration_date"] = df[
             "fm.bocw_card_registration_date"
         ].astype(str)
+    if "fm.renewal_date" in keys:
+        df["fm.renewal_date"] = df["fm.renewal_date"].astype(str)
     df = df.fillna(np.nan).replace([np.nan], [None])
     return df.to_dict("records")
 
